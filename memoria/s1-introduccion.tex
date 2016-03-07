@@ -1,0 +1,195 @@
+\section{El juego}
+\subsection{Introducción}
+\label{s1:subsec:introduccion}
+Con el objetivo de introducir a niños en edades tempranas en el mundo
+de la informática, en los últimos años se han realizado grandes
+esfuerzos en la creación de herramientas sencillas que sirvan como una
+primera introducción a la programación.
+
+El ejemplo más conocido es Scratch\cite{scratch}, consistente en un
+lenguaje de programación visual que permite, mediante interacciones
+\emph{drag\&drop} y un sistema de encaje de fichas de puzzle,
+construir programas funcionales sin mucha dificultad.\\
+
+Alternativamente a la creación de lenguajes de programación orientados
+a este fin, existen multitud de juegos con este propósito, donde la
+idea común a todos ellos es la de guiar a un personaje en un tablero
+para alcanzar diferentes objetivos. Para que el personaje se mueva, el
+usuario tendrá que programar la secuencia de movimientos que este ha
+de realizar. Algunos de estos juegos pueden ser
+Cargo-Bot\cite{cargo-bot}, Bee-bot\cite{bee-bot} o
+Light-bot\cite{light-bot}.
+
+
+\subsection{Descripción del juego}
+\label{s1:subsec:descripcion}
+El videojuego creado se basa en el juego \emph{light
+  bot}\cite{light-bot}. El objetivo del juego es mover al personaje
+principal (representado por un cilindro y un cubo) por el tablero con
+el objetivo de colorear todas las casillas marcadas en azul en un
+color amarillo. Para ello, el usuario posee una serie de botones en la
+parte derecha de la pantalla con los que puede ordenar al robot
+realizar distintas órdenes que luego ejecutará en la parte
+izquierda. La imagen~\ref{s1:fig:interfaz} muestra une ejemplo de la
+interfaz.
+
+\begin{figure}[h]
+  \begin{minipage}{0.5\textwidth}
+    \includegraphics[width=\textwidth]{images/interfaz_menu.png}
+  \end{minipage}
+  \begin{minipage}{0.5\textwidth}
+    \includegraphics[width=\textwidth]{images/interfaz.png}
+  \end{minipage}
+  \caption{Ejemplo de la interfaz del juego}
+  \label{s1:fig:interfaz}
+\end{figure}
+
+
+Como se puede observar en al figura, la pantalla del juego se
+encuentra dividida en dos zonas (derecha e izquierda). La zona
+izquierda muestra al robot y el tablero, y una vez introducidos los
+comandos, es donde estos se reproducirán. La parte derecha de la
+pantalla la forman los distintos comandos que puede ejecutar el
+personaje, y permite al jugador combinarlos para superar el nivel.
+
+La forma que tiene el jugador de interactuar con el juego es haciendo
+clicks en los distintos comandos que se presentan, colocándolos en los
+paneles que aparecen para posteriormente ejecutarlos. Los comandos
+que puede realizar el usuario son:
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}\hline
+    \includegraphics[scale=0.5]{./images/actions/up.png} &
+    \includegraphics[scale=0.5]{./images/actions/right.png} &
+    \includegraphics[scale=0.5]{./images/actions/left.png} &
+    \includegraphics[scale=0.5]{./images/actions/jump.png} &
+    \includegraphics[scale=0.5]{./images/actions/light.png} &
+    \includegraphics[scale=0.5]{./images/actions/p1.png} &
+    \includegraphics[scale=0.5]{./images/actions/p2.png} \\ \hline \hline
+    Avanzar & Girar dcha. & Girar izq. & Saltar & Iluminar & Proc. 1 &
+    Proc. 2 \\\hline
+  \end{tabular}
+\end{table}
+
+Debajo de los comandos aparecen los tres paneles en los que el jugador
+puede insertar los comandos (\emph{Main}, \emph{P1} y \emph{P2}
+respectivamente). Cuando se reproduzcan los comandos seleccionados, el
+robot comenzará a reproducir los comandos que se encuentran en el
+panel \emph{Main}, y si encuentra algún comando \emph{P1} o \emph{P2},
+pasará a reproducir los comandos de estos paneles. Destacar que las
+llamadas a \emph{P1} y \emph{P2}, no tienen por qué realizarse siempre
+desde \emph{Main}, permitiendo así anidamiento de llamadas a función,
+o incluso bucles en forma de llamadas recursivas sin condición de
+fin\footnote{Aunque una llamada recursiva sin condición de fin pueda
+  parecer un bucle infinito, el juego detecta la condición de victoria
+cuando todas las casillas marcadas en azul se encuentran de color
+amarillo, por lo que la condición de fin viene implícitamente dada por
+que el número de casillas azules sea 0.}.
+
+Al hacer click en una orden, esta se anota en el panel activo que esté
+en ese momento. El panel activo se identifica porque tiene el fondo de
+un color distinto (en la figura~\ref{s1:fig:interfaz} el panel activo
+es el panel \emph{Main}, que tiene el fondo de color amarillo). Para
+seleccionar que panel se encuentra activo es suficiente con hacer
+click encima de él.
+
+Adicionalmente a estos elementos, el jugador posee tres botones más
+con los que interactuar:
+\begin{itemize}
+  \item \emph{Play:} Al pulsar este botón, el robot comienza a
+    reproducir los movimientos de los paneles. El usuario ya no puede
+    modificar las órdenes hasta que el robot finalice. El color de los
+    paneles cambia y el botón de play se transforma en un botón de
+    stop.
+  \item \emph{Borrar:} Situado a la derecha del botón \emph{play},
+    permite eliminar las órdenes del usuario cuando el robot se
+    encuentra parado.
+  \item \emph{Volver al menú:} Situado en la esquina superior
+    izquierda, permite regresar al menú de selección de niveles en
+    cualquier momento de la partida.
+\end{itemize}
+
+
+
+Al hacer click en los distintos paneles, se selecciona el panel activo
+en el que insertar las órdenes. Cuando un panel está activo, se indica
+cambiando en color del fondo del panel (en la
+figura~\ref{s1:fig:interfaz} se ve como el fondo del panel \emph{Main}
+se encuentra de un color amarillo).\\
+
+\textbf{Reproducción}\\
+
+Una vez que el usuario ha introducido los comandos que desea que el
+robot realice y haya pulsado el botón de play, el juego pasa a la fase
+de reproducción de los comandos. En esta fase, el usuario ya no puede
+pulsar ningún botón salvo el de parar la reproducción, y el robot irá
+ejecutando las órdenes una a una, mientras se refleja en la parte
+izquierda de la pantalla.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.65\textwidth]{./images/interfaz_play.png}
+  \caption{El robot reproduciendo las órdenes introducidas.}
+  \label{s1:fig:interfaz_play}
+\end{figure}
+
+
+En la figura~\ref{s1:fig:interfaz_play} se puede observar como el
+robot está ejecutando los comandos introducidos para superar el nivel
+3. Como se observa, el botón de \emph{play} se ha sustituido por el
+botón de \emph{stop}, que volverá a colocar al robot en su posición
+original y permitirá al usuario seguir introduciendo comandos.
+
+Adicionalmente a estos cambios, el comando que esté ejecutando el
+robot en el momento se iluminará, permitiendo asociar cada comando con
+un movimiento. En la figura se observa como el robot está ejecutando
+la segunda llamada a la función \emph{P1}, dentro de la cual está
+realizando el movimiento de giro hacia la derecha.
+
+Cuando un nivel es superado, se informa al usuario de esto mediante un
+cartel en la pantalla, y se vuelve a cargar la pantalla de selección
+de nivel, pero indicando en color verde qué niveles ya han sido
+superados y cuales no.
+
+
+\subsection{Características principales}
+\label{s1:subsec:caracteristicas_principales}
+Aunque el juego se ha descrito en las secciones anteriores, aquí se
+presenta un resumen de las principales características del juego
+relacionadas con la jugabilidad y las dinámicas del juego. En el
+próximo capítulo se detallarán los aspectos relativos a la
+implementación.
+
+\begin{itemize}
+  \item Pantalla de selección de menú. A través de esta pantalla el
+    jugador puede seleccionar qué nivel desea superar. También sirve
+    de control para ver que niveles se han superado con anterioridad o
+    no. El jugador puede volver a esta pantalla en cualquier momento
+    del juego.
+  \item Múltiples paneles donde introducir los comandos. Al existir
+    distintos paneles, existe la idea de panel activo, que el jugador
+    puede cambiar en cualquier momento mientras se encuentra
+    introduciendo comandos.
+  \item Llamadas entre paneles. El usuario puede introducir llamadas
+    entre paneles mediante los comandos \emph{P1} y \emph{P2}. De esta
+    manera se permite simular llamadas a función, llamadas a función
+    anidadas, y llamadas recursivas.
+  \item Modo ejecución. Cuando el robot se encuentra reproduciendo los
+    comandos el usuario no puede insertar o borrar los comandos
+    introducidos, siendo necesario parar la ejecución primero.
+  \item Modo resaltado durante la ejecución. Al ejecutar los distintos
+    comandos, estos se iluminan permitiendo seguir la ejecución de los
+    mismos de manera visual.
+\end{itemize}
+
+
+%
+%
+%%%
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "./main.tex"
+%%% End:
+
+

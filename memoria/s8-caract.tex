@@ -1,0 +1,34 @@
+\section{Características principales de la implementación}
+Las características principales de la implementación del juego vienen
+resumidas a continuación:
+
+\begin{itemize}
+\item Se utilizan dos cámaras para componer la interfaz del juego. Cada
+  cámara muestra subespacio de la escena. La interfaz de cada cámara se
+  encuentra gestionada por su propio script.
+\item Diseño de niveles a través de una estructura xml. Permite crear y
+  modificar niveles de manera sencilla.
+\item Utilización de sprites para la creación de botones.
+\item utilización de distintos materiales desde el código que permite
+  cambiar el fondo de los botones y algunos aspectos.
+\item Utilización de curvas de Bezier para el movimiento de salto del
+  robot, produciendo un movimiento más natural. Los movimientos se
+  implementan en un componente aparte permitiendo su reutilización,
+  mientras que la lógica de los movimientos (saber si se puede mover o no),
+  la implementa el componente Robot.
+\item Control de errores antes de ejecutar una acción. Si el robot no es
+  capaz de ejecutar una acción, continúa ejecutando la siguiente.
+\item Creación de un sistema basado en una pila para simular la
+  reproducción de los comandos. Permite generar una traza de la ejecución
+  (mostrada en formato visual mediante los colores del fondo de las
+  acciones), y simular llamadas recursivas y llamadas anidadas.
+\item Utilización de dos escenas: la escena de menú y la escena de juego.
+\item La escena de juego es la misma para todos los niveles, lo que se
+  cambia es el fichero xml desde el que leer el mapa.
+\item Para la gestión entre el menú y la escena del juego, así como para
+  almacenar los niveles superados se utiliza una clase estática que
+  permanece instanciada durante toda la ejecución.
+\item La creación de los paneles donde insertar los comandos se realiza de
+  forma procedural, permitiendo crear tantos paneles como sean necesarios,
+  así como elegir el tamaño de cada uno de los paneles.
+\end{itemize}

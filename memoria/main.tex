@@ -1,0 +1,108 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[latin1]{inputenc} 
+\usepackage[spanish]{babel}
+\decimalpoint
+\setlength{\parskip}{0.5\baselineskip} 
+\usepackage{fullpage}
+\usepackage[procnames]{listings}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage[fleqn]{amsmath}
+\parindent 0in 
+\setlength{\mathindent}{0pt}
+\usepackage{float}
+\usepackage{hyperref}
+
+% \hypersetup{
+%   pdfkeywords={DEV,unity,Light-bot,LuisCostero,UCM,MII},
+%   pdfsubject={{DEV Proyecto final de la asignatura. Luis Costero}},
+%   pdfcreator={pdflatex - Luis Costero}}
+
+
+%% DEFINICIONES
+\newcommand{\TODO}[1]{{\huge \color{red} \textbf{TODO: }#1 }}
+\newcommand{\todo}[1]{{\large \color{red} \textbf{TODO: }#1 }}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+
+
+\definecolor{bluekeywords}{rgb}{0,0,1}
+\definecolor{greencomments}{rgb}{0,0.5,0}
+\definecolor{redstrings}{rgb}{0.64,0.08,0.08}
+\definecolor{xmlcomments}{rgb}{0.5,0.5,0.5}
+\definecolor{types}{rgb}{0.17,0.57,0.68}
+
+\lstset{language=[Sharp]C,
+  captionpos=b,
+  numbers=left, %Nummerierung
+  numberstyle=\tiny, % kleine Zeilennummern
+  frame=lines, % Oberhalb und unterhalb des Listings ist eine Linie
+  showspaces=false,
+  showtabs=false,
+  breaklines=true,
+  showstringspaces=false,
+  breakatwhitespace=true,
+  escapeinside={(*@}{@*)},
+  commentstyle=\color{greencomments},
+  morekeywords={partial, var, value, get, set},
+  keywordstyle=\color{bluekeywords},
+  stringstyle=\color{redstrings},
+  basicstyle=\ttfamily\small,
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document} 
+
+\input{title.tex}
+\tableofcontents
+
+
+\newpage{}
+\part{El juego}
+\input{s1-introduccion.tex}
+\newpage{}
+
+\part{Implementación}
+\input{s2-camera.tex}
+\newpage{}
+
+\input{s3-gui.tex}
+\newpage{}
+
+\input{s4-robot.tex}
+\newpage{}
+
+\input{s5-acciones.tex}
+\newpage{}
+
+\input{s6-director.tex}
+\newpage{}
+
+\input{s7-menu.tex}
+\newpage{}
+
+\input{s8-caract.tex}
+
+
+\newpage{}
+\bibliographystyle{plain}
+\bibliography{references} 
+
+
+\end{document}
+
+
+
+%
+%
+%%%
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "./main.tex"
+%%% End:
+

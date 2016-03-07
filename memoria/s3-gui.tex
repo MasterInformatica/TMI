@@ -1,0 +1,470 @@
+\section{El tablero del juego}
+\label{s3:sec:tablero}
+
+\subsection{Ficheros xml}
+\label{s3:subsec:xml}
+Para la implementación de los niveles se ha decidido crear una estructura
+xml que permita guardar cada nivel en un fichero independiente. De esta
+manera, solamente es necesaria una escena que carga un mapa u otro
+dependiendo del nivel elegido.
+
+La estructura del fichero xml elegida consta de 3 partes bien
+diferenciadas:
+\begin{enumerate}
+  \item \texttt{dimensions}: Representa el tamaño que va a tener cada celda
+    del juego, las cubiertas, el tamaño del mapa y la escala respecto al
+    prefab guardado.
+  \item \texttt{board}: Representa a las casillas del tablero. Permite
+    establecer una altura por defecto a cada celda. Además, cada celda
+    viene definida por las coordenadas (x,z), la altura y, y un atributo
+    indicando si es una celda objetivo o no (\emph{goal}).
+  \item \texttt{robot}: Indica la posición original del robot, y la
+    rotación con la que tiene que comenzar.
+\end{enumerate}
+
+En el código~\ref{s3:lst:xml} se muestra un ejemplo de nivel, que
+corresponde al nivel 1 mostrado en la figura~\ref{s1:fig:interfaz}.\\
+
+\begin{lstlisting}[caption={Ejemplo de nivel 1 del juego}, label=s3:lst:xml]
+<xml>
+	<dimensions>
+		<board length_x="10" length_z="10" scale="2"/>
+		<block size="1" separation="0.1" />
+		<cover size="0.1" />
+		<robot height="2" />
+	</dimensions>
+
+	<board default_height="0" >	
+		<tile x="2" z="0" height="1" />
+		<tile x="2" z="1" height="1" />
+		<tile x="2" z="2" height="2" />
+		<tile x="1" z="2" height="1" />
+		<tile x="0" z="2" height="2" />
+		<tile x="0" z="1" height="1" />
+		<tile x="0" z="0" height="2" attr="goal"/>	
+	</board>
+	
+	<robot>
+		<position x="2" y="1" z="0" />
+		<rotation x="0" y="-90" z="0" />
+	</robot>
+</xml>
+\end{lstlisting}
+
+\subsection{Leyendo el fichero, creando el tablero}
+Para la lectura del nivel en formato xml, y la creación del tablero por
+pantalla, se utiliza el script de nombre \texttt{GUI\_Layout.cs}, que
+realiza ambas cosas. Para la creación por pantalla, se utilizan prefabs que
+representan a los bloques y cubiertas de los bloques, así como los
+distintos materiales usados para encender y apagas las celdas. Estos
+elementos se asocian al script mediante la interfaz de unity.
+
+Para almacenar las casillas internamente, se ha decidido almacenar de
+manera separada la definición de la representación visual. Para la
+definición de la celda, se utilizan las siguientes estructuras, que más
+tarde se utilizarán desde el script:
+
+\begin{minipage}{0.5\textwidth}
+  \begin{lstlisting}
+/* Definicion de una casilla. */
+public class TileDef {
+  public TileType type;
+  private int _height;
+  public int height {
+    get{ return _height; }
+    set{
+      _height = value;
+      if (value <= 0)
+      type = TileType.none;
+    }
+  }
+  
+  public bool isOn;
+  public int x;
+  public int z;
+}
+  \end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+  \begin{lstlisting}
+/* Tipos para una casilla */
+public enum TileType{
+  normal,
+  goal,
+  none
+}
+  \end{lstlisting}
+\end{minipage}
+
+
+El script lo que realiza en primer lugar es la lectura del tablero xml
+sobre las variables. Una vez leído el tablero entero, se dibuja la interfaz
+a partir de estas variables, y en último lugar se coloca al robot en su
+posición correcta.
+
+El método que lee el fichero xml es el siguiente:
+\begin{lstlisting}[caption={Método encargado de la lectura del fichero
+      xml}]
+/** Script encargado de toda la interfaz de la parte izquierda.
+ * Crea el tablero a partir de un fichero xml, y coloca al robot en la posicion adecuada.
+ * Almacena el tablero de forma logica para poder comprobar si los movimientos son posibles.
+ * La representacion fisica de la representacion logica se encuentran almacenadas de manera independiente.
+ */
+public class GUI_Layout : MonoBehaviour {
+  public static GUI_Layout S;//Singleton para acceder
+  
+  // Prfebs para crear una casilla
+  public GameObject tileBlock_prefab;
+  public GameObject specialCover_prefab;
+  public GameObject normalCover_prefab;
+  
+  // Materiales para el cover de una casilla
+  public Material offCover_material;
+  public Material onCover_material;
+  
+  //Prefab del robot
+  public GameObject robot_prefab;
+  
+  
+  // Lectura del xml
+  public PT_XMLReader      xmlr;  // PT_XMLReader
+  public PT_XMLHashtable   xml;
+  
+  
+  // Lista de xml para cada nivel
+  public TextAsset[] niveles;
+  
+  
+  // tamanyo maximo del tablero
+  public int MAX_SIZE=20;
+  
+  //Texto para mostrar el numero de nivel
+  public GameObject LevelTxt;
+  
+  
+  public bool _____________________ ;
+  public TextAsset texto;
+  
+  // Datos para pintar el mapa. Leidos del xml
+  private float blockSize = 1f; 
+  private float blockSeparation = 0.1f;
+  private float coverSize = 0.1f; 
+  private float scale = 2f;
+  
+  //Datos para pintar el robot. Leidos del xml
+  private Vector3 robotPosition;
+  private Vector3 robotRotation;
+  private float robotHeight;
+  
+  //tamanyo del tablero
+  private int size_x;
+  private int size_z;
+  private int default_height;
+  
+  // Definiciones e instancias de las celdas
+  public TileDef[,] board_def;
+  public GameObject[,] board;
+  
+  //Anchor para el board
+  public GameObject boardAnchor;
+  
+  //Gameobject del robot para poder destruirlo
+  public GameObject robot;
+  
+  
+  
+  public void Awake(){
+    S = this;
+    this.texto = this.niveles[levelLoad.level-1];
+    
+    GUIText gt = this.LevelTxt.GetComponent<GUIText>();
+    gt.text = "Nivel: " + levelLoad.level;
+  }
+  
+  
+  public void Start(){
+    this.resetLayout ();
+    
+    this.readLayout (texto.text);
+    
+    this.drawlayout ();
+    this.drawRobot();
+    
+  }
+  
+  
+  // -------------------------------------
+  // -------------- METODOS --------------
+  // -------------------------------------
+  
+  /*
+   * carga el tablero definido en el xml pasado por paramtero
+   */
+  public void readLayout(string xmlText){
+    //Antes de hacer nada, reseteamos el tablero
+    this.resetLayout ();
+    
+    xmlr = new PT_XMLReader();
+    xmlr.Parse(xmlText); 
+    xml = xmlr.xml["xml"][0];
+    
+  
+    //1.- Definiciones de las dimensiones
+    PT_XMLHashtable dimensions = xml["dimensions"][0];
+    //1.1 - tablero
+    this.size_x = int.Parse (dimensions ["board"][0].att ("length_x"));
+    this.size_z = int.Parse (dimensions ["board"][0].att ("length_z"));
+    this.scale = float.Parse (dimensions ["board"][0].att ("scale"));
+    
+    //1.2 - bloque
+    this.blockSize = float.Parse (dimensions ["block"][0].att ("size"));
+    this.blockSeparation = float.Parse (dimensions ["block"][0].att ("separation"));
+    
+    //1.3 - cover
+    this.coverSize = float.Parse (dimensions ["cover"][0].att ("size"));
+    
+    //1.4 - robot
+    this.robotHeight = float.Parse (dimensions ["robot"][0].att("height"));
+    
+    
+    //2.- Celdas por defecto
+    this.default_height = int.Parse (xml ["board"] [0].att ("default_height"));
+    this.initBoard (this.default_height, this.size_x, this.size_z);
+    
+    
+    //3.- Definimos de las celdas
+    PT_XMLHashList tileX = xml["board"][0]["tile"];
+    for (int i=0; i<tileX.Count; i++) {
+      int x, z;
+      x = int.Parse (tileX[i].att("x"));
+      z = int.Parse (tileX[i].att("z"));
+      
+      
+      this.board_def[x, z].height = int.Parse(tileX[i].att ("height"));
+      
+      string attr = (tileX[i].HasAtt("attr")) ? tileX[i].att ("attr") : "none";
+      switch (attr){
+        case "goal":
+          this.board_def[x,z].type=TileType.goal;
+          Director.S.totalGoals ++;
+          break;
+        default:
+          this.board_def[x,z].type = TileType.normal;
+          break;
+      }
+      this.board_def[x,z].isOn = false;
+    }
+    
+    //4.- Posicion inicial del robot.
+    PT_XMLHashtable robot = xml["robot"][0]["position"][0];
+    this.robotPosition = new Vector3(float.Parse(robot.att("x")),
+                float.Parse(robot.att("y")),
+                float.Parse(robot.att("z")));
+    robot = xml["robot"][0]["rotation"][0];
+    this.robotRotation = new Vector3(float.Parse(robot.att("x")),
+                float.Parse(robot.att("y")),
+                float.Parse(robot.att("z")));
+    
+    //Transformamos la rotacion en el intervalo [0,360)
+    while(this.robotRotation.y < 0){
+      this.robotRotation.y += 360;
+    }
+    while(this.robotRotation.y >=360){
+      this.robotRotation.y -= 360;
+    }
+}
+\end{lstlisting}
+
+
+Una vez leído los datos del tablero, se dibuja la interfaz asociada a este
+tablero, y también se coloca el robot en su posición. Los métodos
+encargados de esto son los siguientes:
+
+\begin{lstlisting}[caption={Métodos para dibujar el tablero y al robot}]
+/** Dibuja los bloques del tablero segun la definicion guardada en this.board_def.
+* Agrupa todos los elementos en un layout. Se supone que se ha invocado
+* con anterioridad a resetLayout() que borra todos los hijos del anchor
+* (es decir, borra todos los bloque creados)
+*/
+private void drawlayout(){
+  GameObject tile;
+  for (int i=0; i<this.size_x; i++) {
+    for (int j=0; j<this.size_z; j++) {
+      if(this.board_def[i,j].type == TileType.none)
+      continue;
+      
+      //Creamos el tile
+      tile = createTile(this.board_def[i,j].height, this.board_def[i,j].type == TileType.goal);
+      tile.name = "" + i + "x" + j;
+      //posicion segun la i, j
+      tile.transform.position = new Vector3(i*(2*this.blockSize + this.blockSeparation), 0,
+      j*(2*this.blockSize + this.blockSeparation));
+      //hijo del anchor
+      tile.transform.parent = this.boardAnchor.transform;
+      
+      //lo guardamos en el mapa
+      this.board[i,j] = tile;
+    }
+  }
+}
+
+/** 
+* Dibuja al robot en la posicion original leida del xml.
+* El robot viene definido por una posicion inicial, y una direccion
+* a la que se encuentra mirando.
+*/
+private void drawRobot(){
+  GameObject robot = Instantiate(this.robot_prefab) as GameObject;
+  
+  //Colocar en la posicion y la rotacion
+  robot.transform.position = new Vector3(this.robotPosition.x*(2*this.blockSize + this.blockSeparation),
+  (this.robotPosition.y-1)*(this.blockSize + this.blockSeparation) + 
+  this.robotHeight + this.blockSize/2 + this.coverSize,
+  this.robotPosition.z*(2*this.blockSize + this.blockSeparation));
+  
+  robot.transform.rotation = Quaternion.Euler(this.robotRotation);
+  
+  //Calculamos la direccion a la que mira
+  Vector3 dir;
+  if(this.robotRotation.y < 90)
+    dir = new Vector3(1,0,0);
+  else if (this.robotRotation.y < 180)
+    dir = new Vector3(0,0,-1);
+  else if (this.robotRotation.y < 270)
+    dir = new Vector3(-1,0,0);
+  else 
+    dir = new Vector3(0,0,1);
+  
+    ((Movement)robot.GetComponent<Movement>()).dirAct = dir;
+    ((Movement)robot.GetComponent<Movement>()).rotAct = this.robotRotation;
+    
+    
+    ((Robot)robot.GetComponent<Robot> ()).init ((int)(this.robotPosition.x), (int)(this.robotPosition.y), 
+    (int)(this.robotPosition.z),
+    (int)dir.x, (int)dir.z);
+    
+    this.robot = robot;
+}
+
+
+/*
+* Resetea las variables necesarias para iniciar una nueva ejecucion.
+*/
+private void resetLayout(){
+  this.board_def = new TileDef[MAX_SIZE, MAX_SIZE];
+  if(this.board != null){
+    for (int i=0; i<MAX_SIZE; i++)
+    for (int j=0; j<MAX_SIZE; j++)
+    Destroy(this.board[i,j]);
+  }
+  
+  this.board = new GameObject[MAX_SIZE, MAX_SIZE];
+  
+  //Destruimos y volvemos a crear el boardAnchor
+  if (this.boardAnchor != null) {
+    Destroy (this.boardAnchor);
+  }
+  this.boardAnchor = new GameObject ();
+  this.boardAnchor.name = "BoardAnchor";
+  
+  if(this.robot != null)
+  Destroy(robot);
+  
+  Director.S.totalGoals = 0;
+}
+
+
+/*
+ * Inicia el tablero de tamanyo nxm con celdas de altura h.
+ * Si es una casilla fuera de n,m lo inicializa con una celda a none.
+ */
+private void initBoard (int h, int n, int m){
+  TileDef td;
+  for (int i=0; i<this.MAX_SIZE; i++) {
+    for (int j=0; j<this.MAX_SIZE; j++) {
+      td = new TileDef();
+      td.x = i;
+      td.z = j;
+      td.height = h;
+      
+      
+      if(i> n || j> m){ //fuera del tablero
+	td.type = TileType.none;
+	this.board_def[i,j] = td;
+      } else { //Celda buena por defecto
+	td.type = (h<=0) ? TileType.none : TileType.normal;
+	this.board_def[i,j] = td;
+      }
+    }
+  }
+}
+
+	
+/*
+ * Devuelve un objeto con una torre de bloques creada, de altura pasada por parametro.
+ * El atributo special indica si es una casilla objetivo o no
+ */
+private GameObject createTile(int height, bool special){
+  GameObject tile = new GameObject ();
+  
+  //1.- Bloques: escala, hijos del tile, apilar encima.
+  GameObject go;
+  for (int i = 0; i<height; i++){
+    go = Instantiate(this.tileBlock_prefab) as GameObject;
+    go.transform.localScale = new Vector3(this.scale, this.blockSize, this.scale);
+    go.transform.parent = tile.transform; //hijo del tile
+    go.transform.position = new Vector3(0, i*(this.blockSize + this.blockSeparation), 0); //encima del anterior
+    go.name = "block_" + i;
+  }
+  
+  //2.- Cover
+  go = special ? Instantiate (this.specialCover_prefab) : Instantiate (this.normalCover_prefab);
+  go.transform.localScale = new Vector3 (this.scale, this.coverSize, this.scale);
+  go.transform.parent = tile.transform;
+  
+  float h = (height - 1) * (this.blockSize + this.blockSeparation) + this.blockSize / 2f + this.coverSize / 2f; 
+  go.transform.position = new Vector3(0, h, 0);
+  go.name = "cover";
+  
+  return tile;
+}
+
+\end{lstlisting}
+
+Por último, se incorpora un método que permite cambiar el color de una
+celda en el tablero:
+\begin{lstlisting}[caption={Método para cambiar el color de una celda
+      especial}]
+/*
+ * Ilumina la celda de la possicion (x,z) si esta es de tipo goal.
+ * Si estaba encendida, la apaga.
+ */
+public int SwitchLight(int x, int z){
+  if (this.board_def [x, z].type != TileType.goal)
+    return 0;
+  
+  TileDef td = this.board_def[x,z];
+  GameObject go = this.board [x, z];
+  
+  Renderer rmat = null;
+  foreach (Transform t in go.transform) {
+    if (t.name == "cover"){
+      rmat = t.gameObject.GetComponent<Renderer>();
+    }
+  }
+  
+  
+  if (td.isOn == false) {
+    rmat.material = this.onCover_material;
+    td.isOn = true;
+    
+    return 1;
+  }
+  else{
+    rmat.material = this.offCover_material;
+    td.isOn = false;
+    
+    return -1;
+  }
+}
+\end{lstlisting}

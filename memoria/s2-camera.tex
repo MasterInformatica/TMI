@@ -1,0 +1,27 @@
+\section{Las cámaras del juego}
+\label{s2:sec:camaras}
+Como se ha descrito en la sección anterior, la interfaz del juego se
+encuentra dividida en dos secciones claramente diferenciadas (derecha e
+izquierda). Cada sección posee sus propios scripts para el dibujado de la
+interfaz y el control de las acciones del usuario. Para relacionar ambas
+partes, se utiliza un script de nombre \texttt{Director.cs} que se encarga
+de comunicarse y coordinar ambas partes.
+
+Para realizar esta división de la interfaz, se ha decidido utilizar dos
+cámaras sobre regiones distintas del espacio, y configurarlas según se
+muestra en la figura~\ref{s2:fig:camaras} para que compartan la pantalla.
+
+\begin{figure}[h]
+  \begin{minipage}{0.5\textwidth}
+    \includegraphics[width=\textwidth]{images/camaras/izq.png}
+  \end{minipage}
+  \begin{minipage}{0.5\textwidth}
+    \includegraphics[width=\textwidth]{images/camaras/dcha.png}
+  \end{minipage}
+  \caption{Configuración de las cámaras}
+  \label{s2:fig:camaras}
+\end{figure}
+
+Además, para evitar que los textos se rendericen en ambas cámaras, se han
+creado dos capas nuevas y configurado el \emph{Culling Mask} de cada cámara
+para que cada una renderice una capa del juego.

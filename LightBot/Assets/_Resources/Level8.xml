@@ -1,0 +1,38 @@
+<xml>
+
+	<dimensions>
+		<board length_x="10" length_z="10" scale="2"/>
+		<block size="1" separation="0.1" />
+		<cover size="0.1" />
+		<robot height="2" />
+	</dimensions>
+
+	<board default_height="0" >	
+		
+		<tile x="2" z="4" height="1" />
+		<tile x="1" z="4" height="1" />
+		<tile x="0" z="4" height="2" />
+						
+		<tile x="2" z="3" height="1" />
+		<tile x="1" z="3" height="1" />
+		<tile x="0" z="3" height="2" />
+		
+		<tile x="2" z="2" height="3" />
+		<tile x="1" z="2" height="3" />
+		<tile x="0" z="2" height="3" attr="goal" />
+		
+		<tile x="2" z="1" height="4" />
+		<tile x="1" z="1" height="1" />
+		<tile x="0" z="1" height="1" />
+		
+		<tile x="2" z="0" height="4" attr="goal" />
+		<tile x="1" z="0" height="1" />
+		<tile x="0" z="0" height="1" />
+		
+	</board>
+	
+	<robot>
+		<position x="2" y="1" z="4" />
+		<rotation x="0" y="180" z="0" />
+	</robot>
+</xml>
