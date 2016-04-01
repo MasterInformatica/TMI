@@ -7,6 +7,10 @@ public class MusicManager : MonoBehaviour {
 	public static MusicManager S; //Singleton
 
 
+	public GameObject casillaRef;
+	public Metodo2 m;
+
+
 	public List<double> rhythm;
 	private int currentIdx = 0;
 
@@ -22,17 +26,46 @@ public class MusicManager : MonoBehaviour {
 		initMusic();
 		//Chapuza para no tener que calcular cuando nos salimos
 		rhythm.Add(1e9);
+
+
+		m = casillaRef.GetComponent<Metodo2>();
+
 	}
 		
 	private void initMusic(){
 		rhythm = new List<double>();
+		rhythm.Add(0.0);
+		rhythm.Add(0.5);
+		rhythm.Add(0.8);
+		rhythm.Add(1.2);
+		rhythm.Add(1.6);
+		rhythm.Add(2.4);
+		rhythm.Add(2.8);
+		rhythm.Add(3.2);
+		rhythm.Add(3.6);
+		rhythm.Add(4.0);
+		rhythm.Add(4.4);
+		rhythm.Add(5.0);
+		rhythm.Add(5.2);
+		rhythm.Add(7.0);
 
-		rhythm.Add(1.0);
+
+/*		rhythm.Add(0.0);
 		rhythm.Add(2.0);
 		rhythm.Add(3.0);
-		rhythm.Add(4.5);
+		rhythm.Add(4.0);
+		rhythm.Add(5.0);
 		rhythm.Add(6.0);
 		rhythm.Add(7.0);
+		rhythm.Add(8.0);
+		rhythm.Add(9.0);
+		rhythm.Add(10.0);
+		rhythm.Add(11.0);
+		rhythm.Add(12.0);
+		rhythm.Add(13.0);
+		rhythm.Add(14.0);
+*/
+
 	}
 
 
@@ -53,6 +86,8 @@ public class MusicManager : MonoBehaviour {
 	public void StartTime(){
 		relativeTime = Time.time;
 		currentIdx = 0;
+
+		m.startMvto((float)(rhythm[1] - rhythm[0]));
 	}
 
 	void Update(){
@@ -64,7 +99,11 @@ public class MusicManager : MonoBehaviour {
 		
 		float currentTime = Time.time - relativeTime;
 
-		if(rhythm[currentIdx+1] <= currentTime)
+		if(rhythm[currentIdx+1] <= currentTime){
 			currentIdx ++;
+			m.startMvto((float)(rhythm[currentIdx+1] - rhythm[currentIdx]));
+		}
 	}
+
+
 }
