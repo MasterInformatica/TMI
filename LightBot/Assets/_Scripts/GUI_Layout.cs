@@ -10,6 +10,7 @@ public enum TileType{
 	none
 }
 
+
 /* Definicion de una casilla. */
 public class TileDef {
 	public TileType type;
@@ -26,6 +27,10 @@ public class TileDef {
 	public bool isOn;
 	public int x;
 	public int z;
+
+	//Para movimiento de casillas normal
+	public tipoMovimiento typeMvto;
+	public int nSteps;
 }
 
 
@@ -39,7 +44,9 @@ public class TileDef {
 public class GUI_Layout : MonoBehaviour {
 	public static GUI_Layout S;//Singleton para acceder
 
+
 	// Prfebs para crear una casilla
+	public GameObject tileMvto_prefab; // Prefab vacio para las casillas con movimientos.
 	public GameObject tileBlock_prefab;
 	public GameObject specialCover_prefab;
 	public GameObject normalCover_prefab;
@@ -116,6 +123,8 @@ public class GUI_Layout : MonoBehaviour {
 		this.drawlayout ();
 		this.drawRobot();
 
+		//Iniciamos el music manager
+		MusicManager.S.StartTime();
 	}
 
 
@@ -180,6 +189,26 @@ public class GUI_Layout : MonoBehaviour {
 				break;
 			}
 			this.board_def[x,z].isOn = false;
+
+			//leemos movimientos.
+			string mvto_t = (tileX[i].HasAtt("mvto")) ? tileX[i].att("mvto") : "none";
+			switch( mvto_t){
+			case "h":
+				this.board_def[x,z].typeMvto = tipoMovimiento.horizontal;
+				this.board_def[x,z].nSteps = int.Parse(tileX[i].att("nsteps"));
+				break;
+			case "v":
+				this.board_def[x,z].typeMvto = tipoMovimiento.vertical;
+				this.board_def[x,z].nSteps = int.Parse(tileX[i].att("nsteps"));
+				break;
+			case "f":
+				this.board_def[x,z].typeMvto = tipoMovimiento.frente;
+				this.board_def[x,z].nSteps = int.Parse(tileX[i].att("nsteps"));
+				break;
+			case "none":
+				this.board_def[x,z].typeMvto = tipoMovimiento.none;
+				break;
+			}
 		}
 
 		//4.- Posicion inicial del robot.
@@ -216,7 +245,7 @@ public class GUI_Layout : MonoBehaviour {
 					continue;
 
 				//Creamos el tile
-				tile = createTile(this.board_def[i,j].height, this.board_def[i,j].type == TileType.goal);
+				tile = createTile(this.board_def[i,j].height, this.board_def[i,j].type == TileType.goal, i, j);
 				tile.name = "" + i + "x" + j;
 				//posicion segun la i, j
 				tile.transform.position = new Vector3(i*(2*this.blockSize + this.blockSeparation), 0,
@@ -326,8 +355,12 @@ public class GUI_Layout : MonoBehaviour {
 	 * Devuelve un objeto con una torre de bloques creada, de altura pasada por parametro.
 	 * El atributo special indica si es una casilla objetivo o no
 	 */
-	private GameObject createTile(int height, bool special){
-		GameObject tile = new GameObject ();
+	private GameObject createTile(int height, bool special, int x, int z){
+
+		GameObject tile = (this.board_def[x,z].typeMvto == tipoMovimiento.none) ? 
+			new GameObject() : 
+			Instantiate(this.tileMvto_prefab);
+
 
 		//1.- Bloques: escala, hijos del tile, apilar encima.
 		GameObject go;
@@ -347,7 +380,15 @@ public class GUI_Layout : MonoBehaviour {
 		float h = (height - 1) * (this.blockSize + this.blockSeparation) + this.blockSize / 2f + this.coverSize / 2f; 
 		go.transform.position = new Vector3(0, h, 0);
 		go.name = "cover";
-		
+
+
+		//3.- Casillas de movimiento
+		if(this.board_def[x,z].typeMvto != tipoMovimiento.none){
+			tile.GetComponent<TileMvto>().TAM = (2*this.blockSize);// + this.blockSeparation;
+
+			tile.GetComponent<TileMvto>().initMvto(this.board_def[x,z].typeMvto, this.board_def[x,z].nSteps);
+		}
+
 		return tile;
 	}
 

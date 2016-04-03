@@ -144,11 +144,11 @@ public class Director : MonoBehaviour {
 			break;
 		case ActionType.p1:
 			this.llamadas.Push(new PairInt(1, 0));
-			Invoke("Next", 1);
+			Invoke("Next", 0);
 			break;
 		case ActionType.p2:
 			this.llamadas.Push (new PairInt(2,0));
-			Invoke("Next", 1);
+			Invoke("Next", 0);
 			break;
 		default:
 			break;

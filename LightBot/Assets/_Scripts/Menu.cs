@@ -23,7 +23,7 @@ public class Menu : MonoBehaviour {
 	//Comprobamos si el nivel se ha superado y lo pintamos de verde
 	public void Start(){
 		//cambiar el material del fondo
-		if(levelLoad.levelPassed[this.level-1]){
+		if(this.level > 0 && levelLoad.levelPassed[this.level-1]){
 			MeshRenderer rmat;
 			rmat = this.transform.parent.GetComponentInChildren<MeshRenderer>();
 			
