@@ -15,9 +15,11 @@ public class MusicManager : MonoBehaviour {
 	public List<double> rhythm;
 	private int currentIdx = 0;
 
+
 	// Por elo momento solo poseemos un nivel de delegados, pero se podría considerear tener varios niveles
 	// de listeners (tiles, logicos, muñeco, ...) y en función de la eficiencia no llamar siempre a todos
-	private List<startMvto_t> listeners;
+	private List<startMvto_t> tile_listeners;
+	private List<startMvto_t> tileDef_listeners;
 
 	/** Marca de tiempo para realizar los cálculos a partir de ella (tiempo 0).
 	 * Invocar la funcion StartTime() antes de comenzar la ejecución del tiempo
@@ -29,7 +31,8 @@ public class MusicManager : MonoBehaviour {
 		S = this;
 		currentIdx=0;
 
-		this.listeners = new List<startMvto_t>();
+		this.tile_listeners = new List<startMvto_t>();
+		this.tileDef_listeners = new List<startMvto_t>();
 
 		initMusic();
 		//Chapuza para no tener que calcular cuando nos salimos
@@ -38,9 +41,12 @@ public class MusicManager : MonoBehaviour {
 
 
 	public void registerTileListener(startMvto_t d){
-		this.listeners.Add(d);
+		this.tile_listeners.Add(d);
 	}
 
+	public void registerTileDefListener(startMvto_t d){
+		this.tileDef_listeners.Add(d);
+	}
 
 	private void initMusic(){
 		rhythm = new List<double>();
@@ -59,8 +65,6 @@ public class MusicManager : MonoBehaviour {
 		rhythm.Add(12.0);
 		rhythm.Add(13.0);
 		rhythm.Add(14.0);
-
-
 	}
 
 
@@ -87,7 +91,12 @@ public class MusicManager : MonoBehaviour {
 	}
 
 	void callListeners(float duracion){
-		foreach(startMvto_t d in this.listeners)
+		//casillas
+		foreach(startMvto_t d in this.tile_listeners)
+			d(duracion);
+
+		//definicion logica de las casillas
+		foreach(startMvto_t d in this.tileDef_listeners)
 			d(duracion);
 	}
 

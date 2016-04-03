@@ -16,7 +16,7 @@
 		
 		<tile x="0" z="2" height="2" />
 		<tile x="0" z="1" height="1" />
-		<tile x="0" z="0" height="2" attr="goal"/>	
+		<tile x="0" z="0" height="2" attr="goal" mvto="v" nsteps="3"/>	
 	</board>
 	
 	<robot>

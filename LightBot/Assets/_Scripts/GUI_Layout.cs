@@ -11,30 +11,6 @@ public enum TileType{
 }
 
 
-/* Definicion de una casilla. */
-public class TileDef {
-	public TileType type;
-	private int _height;
-	public int height {
-		get{ return _height; }
-		set{
-			_height = value;
-			if (value <= 0)
-				type = TileType.none;
-		}
-	}
-
-	public bool isOn;
-	public int x;
-	public int z;
-
-	//Para movimiento de casillas normal
-	public tipoMovimiento typeMvto;
-	public int nSteps;
-}
-
-
-
 /*
  * Script encargado de toda la interfaz de la parte izquierda.
  * Crea el tablero a partir de un fichero xml, y coloca al robot en la posicion adecuada.
@@ -196,14 +172,17 @@ public class GUI_Layout : MonoBehaviour {
 			case "h":
 				this.board_def[x,z].typeMvto = tipoMovimiento.horizontal;
 				this.board_def[x,z].nSteps = int.Parse(tileX[i].att("nsteps"));
+				this.board_def[x,z].createStates();
 				break;
 			case "v":
 				this.board_def[x,z].typeMvto = tipoMovimiento.vertical;
 				this.board_def[x,z].nSteps = int.Parse(tileX[i].att("nsteps"));
+				this.board_def[x,z].createStates();
 				break;
 			case "f":
 				this.board_def[x,z].typeMvto = tipoMovimiento.frente;
 				this.board_def[x,z].nSteps = int.Parse(tileX[i].att("nsteps"));
+				this.board_def[x,z].createStates();
 				break;
 			case "none":
 				this.board_def[x,z].typeMvto = tipoMovimiento.none;
@@ -384,7 +363,7 @@ public class GUI_Layout : MonoBehaviour {
 
 		//3.- Casillas de movimiento
 		if(this.board_def[x,z].typeMvto != tipoMovimiento.none){
-			tile.GetComponent<TileMvto>().TAM = (2*this.blockSize);// + this.blockSeparation;
+			tile.GetComponent<TileMvto>().TAM = (2*this.blockSize) + this.blockSeparation;
 
 			tile.GetComponent<TileMvto>().initMvto(this.board_def[x,z].typeMvto, this.board_def[x,z].nSteps);
 		}
