@@ -72,14 +72,14 @@ public class Director : MonoBehaviour {
 	public void play(){
 		Actions_Layout.S.changeButton();
 
-		if (this.recording) {
+		if (this.recording) {                                //Play
 			this.recording = false;
 			this.llamadas = new Stack<PairInt>();
 			this.llamadas.Push(new PairInt(0,0));
 			Actions_Layout.S.switchOffAllLights();
 
 			Next ();
-		}else{
+		}else{                                               //Stop
 			this.restartLevel();
 		}
 	}

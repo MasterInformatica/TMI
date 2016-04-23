@@ -61,6 +61,7 @@ public class Robot : MonoBehaviour {
 		if (y != GUI_Layout.S.board_def [newpos_x, newpos_z].height)
 			return;
 
+
 		//2.- Mover
 		this.mvt.Avanza ();
 		this.x = newpos_x;
