@@ -152,10 +152,11 @@ public class Movement : MonoBehaviour {
 		
 			this.transform.position = (1 - u) * this.orgPosition + u * this.poi;
 
-			if (u>=1){
+			if (u>=1){ //fin del movimiento
 				this.transform.position = this.poi;
 				isMoving = false; //fin del movimiento
 				Director.S.Next();
+				Robot.S.updatePosition();
 			}
 		}
 
@@ -185,6 +186,7 @@ public class Movement : MonoBehaviour {
 				transform.position = bezierPts[bezierPts.Count-1];
 				this.isJumping = false;
 				Director.S.Next();
+				Robot.S.updatePosition();
 
 			} else { // 0<=u<1, which means that this is interpolating now
 				// Use Bezier curve to move this to the right point
@@ -196,6 +198,7 @@ public class Movement : MonoBehaviour {
 	}
 
 
+	//------------------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Devuelve a partir de la posicion actual y hacia donde este mirando el destino 
@@ -267,5 +270,4 @@ public class Movement : MonoBehaviour {
 		}
 
 	}
-
 }

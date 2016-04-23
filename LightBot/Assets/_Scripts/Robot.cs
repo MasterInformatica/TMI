@@ -11,8 +11,14 @@ public class Robot : MonoBehaviour {
 	public Movement mvt; //Referencia al componente de movimiento.
 
 
+
 	public int x, y, z; //Posicion actual del robot. Sirve para comrpobar si el siguiente movimiento es posible
 	public int _x, _z; //Indica hacia donde esta mirando para poder saber hacia donde moverse
+
+
+
+	//Posiciones originales del robot. Representan la posición original de la celda actual antes de empezar su movimiento.
+	public int original_x, original_z;
 
 
 
@@ -22,9 +28,15 @@ public class Robot : MonoBehaviour {
 	}
 
 
+
 	public void init(int posx, int posy, int posz, int rotx, int rotz){
 		x = posx; y = posy; z = posz;
 		_x = rotx; _z = rotz;
+
+		original_x = x;
+		original_z = z;
+
+		this.updatePosition();
 	}
 
 
@@ -87,7 +99,6 @@ public class Robot : MonoBehaviour {
 		this.x = newpos_x;
 		this.z = newpos_z;
 		this.y = GUI_Layout.S.board_def [newpos_x, newpos_z].height;
-		
 	}
 
 
@@ -129,5 +140,23 @@ public class Robot : MonoBehaviour {
 
 		this.mvt.RotateLeft ();
 	}
-	
+
+
+
+	public void updatePosition(){
+		this.original_x = x;
+		this.original_z = z;
+
+		this.transform.parent = GUI_Layout.S.board[this.original_x, this.original_z].transform;
+
+		//TODO: Al colocarnos en la nueva casilla, sería interesante que nos colocaramos
+		//      centrados para que quede todo más chuli.
+
+		//Al hacer el atach, nos recolocamos por si hemos perdido algo de  precisión
+		//Vector3 newPos = GUI_Layout.S.board[this.original_x, this.original_z].transform.position;
+
+		//this.transform.position = new Vector3(newPos.x, this.transform.position.y, newPos.z);
+
+
+	}
 }

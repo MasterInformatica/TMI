@@ -70,15 +70,20 @@ public class GUI_Layout : MonoBehaviour {
 	private int size_z;
 	private int default_height;
 
+
 	// Definiciones e instancias de las celdas
-	public TileDef[,] board_def;
-	public GameObject[,] board;
+	//-----------------------------------------------------------------------------------------------------------------
+	public TileDef[,] board_def; //Representación _LÓGICA_ del tablero
+	public GameObject[,] board;  //Representación _FÍSICA_ del tablero
+	//-----------------------------------------------------------------------------------------------------------------
+
 
 	//Anchor para el board
 	public GameObject boardAnchor;
 
 	//Gameobject del robot para poder destruirlo
 	public GameObject robot;
+
 
 
 
@@ -404,6 +409,7 @@ public class GUI_Layout : MonoBehaviour {
 			return -1;
 		}
 	}
+
 
 	public void restartLayout(){
 		this.resetLayout ();

@@ -33,6 +33,7 @@ public class MusicManager : MonoBehaviour, AudioProcessor.AudioCallbacks {
 		this.tileDef_listeners = new List<startMvto_t>();
 	}
 
+
 	void Start(){
 		AudioProcessor.S.loadSource(audio);
 		AudioProcessor.S.addAudioCallback(this);
@@ -54,10 +55,14 @@ public class MusicManager : MonoBehaviour, AudioProcessor.AudioCallbacks {
 	}
 
 	void Update(){
-
 	}
 
+
+	//==================================================================================================================
+	//==================================================================================================================
 	void callListeners(float duracion){
+		//Toda la magia se hace aquí
+
 		//casillas
 		foreach(startMvto_t d in this.tile_listeners)
 			d(duracion);
@@ -66,6 +71,10 @@ public class MusicManager : MonoBehaviour, AudioProcessor.AudioCallbacks {
 		foreach(startMvto_t d in this.tileDef_listeners)
 			d(duracion);
 	}
+	//==================================================================================================================
+	//==================================================================================================================
+
+
 
 	public void onOnbeatDetected()
 	{
