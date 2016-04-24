@@ -5,14 +5,26 @@ using System.Collections.Generic;
 /**
  * Estructura auxiliar usada para la reproduccion de los comandos
  */
-struct PairInt {
+
+public class PairInt {
 	public PairInt(int a, int b) {
+		x = a;
+		y = b;
+	}
+
+	public PairInt(){
+		x = -1;
+		y = -1;
+	}
+
+	public void setValues(int a, int b){
 		x = a;
 		y = b;
 	}
 
 	public int x, y;
 }
+
 
 
 /**

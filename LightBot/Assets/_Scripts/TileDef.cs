@@ -143,25 +143,62 @@ public class TileDef {
 
 
 	private void Update(){
+		/*@ DBG @*/
 		if(robot.x == this.original_x &&
 			robot.z == this.original_z){
 		
 			GUIText gt = this.textoDBG.GetComponent<GUIText>();
-			gt.text = ((isMoving) ? "T" : "F") +  ": (" + this.x + " , " + this.y + " , " + this.z + ")";
+			gt.text = "DBG: " + ((isMoving) ? "T" : "F") +  ": (" + this.x + " , " + this.y + " , " + this.z + ")\n";
+//				"       (" + GUI_Layout.S.current_board[this.original_x, this.original_z].x + " , "+
+//				GUI_Layout.S.current_board[this.original_x, this.original_z].y +")";
+
 		}
+		/*@ DBG @*/
 
 		if(Time.time < endTime || endTime < 0) return;
 
 		//Aqui significa que hemos superado el tiempo final, y además no hemos actualizado la pos (endTime > 0)
 		if(isMoving){
+
+
+				
+			//Como nos vamos a mover, nos borramos del current board si nadie lo ha hecho por nosotros
+			if(GUI_Layout.S.current_board[this.x, this.z].x == this.original_x &&
+				GUI_Layout.S.current_board[this.x, this.z].y == this.original_z){
+				GUI_Layout.S.current_board[this.x, this.z] = null;
+			}
+
+
 			currentState = (currentState + 1) % estados.Count;
 
 			x = (int)estados[currentState].x;
 			y = (int)estados[currentState].y;
 			z = (int)estados[currentState].z;
-		}
 
+
+
+			//Y además, como nos hemos movido, nos anotamos en el tablero general.
+			GUI_Layout.S.current_board[x,z] = new PairInt(this.original_x, this.original_z);
+
+
+
+		}
 		endTime = -1;
+	}
+
+
+	/** Estos métodos sirven para identificar si una casilla se está moviendo, parada, cual es su próximo estado,
+	 *  etc. Básicamente se utiliza para comprobar si dos casillas son adyacentes o no
+	 */
+	public Vector3 getCurrentPosition(){
+		return estados[currentState];
+	}
+
+	public Vector3 getNextPosition(){
+		if(isMoving)
+			return estados[(currentState + 1) % estados.Count];
+		else
+			return estados[currentState];
 	}
 
 

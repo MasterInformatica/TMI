@@ -33,8 +33,8 @@ public class Robot : MonoBehaviour {
 		x = posx; y = posy; z = posz;
 		_x = rotx; _z = rotz;
 
-		original_x = x;
-		original_z = z;
+		original_x = posx;
+		original_z = posz;
 
 		this.updatePosition();
 	}
@@ -43,6 +43,10 @@ public class Robot : MonoBehaviour {
 
 	// Avanzar el robot hacia delante.
 	public void moveUP(){
+		int x = GUI_Layout.S.board_def[original_x,original_z].x;
+		int y = GUI_Layout.S.board_def[original_x,original_z].height;
+		int z = GUI_Layout.S.board_def[original_x,original_z].z;
+
 		//1.- Comprobar que se puede mover a la nueva posicion
 		int newpos_x = x + _x;
 		int newpos_z = z + _z;
@@ -52,9 +56,47 @@ public class Robot : MonoBehaviour {
 		   newpos_x >= GUI_Layout.S.MAX_SIZE || newpos_z > GUI_Layout.S.MAX_SIZE)
 			return;
 
-		//1.2- existe la celda
-		if (GUI_Layout.S.board_def[newpos_x, newpos_z].type == TileType.none)
+		PairInt destino = GUI_Layout.S.current_board[newpos_x, newpos_z];
+
+		//1.2- existe la celda destino
+		if (destino==null ||  GUI_Layout.S.board_def[destino.x, destino.y].type == TileType.none)
 			return;
+
+
+		/* 1.3- El robot puede avanzar al frente en los siguientes casos:
+		 *   a) La celda actual se mueve:
+		 *      a.1) La celda destino tmb se mueve: La posicion original y la final es la misma (pueden estar quietos o en mvto).
+		 *      a.2) La celda destino no se mueve: Imposible moverse allí
+		 *   b) La celda actual está quieta:
+		 *      b.1) Destino se mueve: Imposible moverse allí
+		 *      b.2) Destino quieta: Comprobación normal.
+		 */
+
+	/*	//1.3.a Actual se mueve
+		if( GUI_Layout.S.board_def[this.original_x, this.original_z].isMoving){
+			//1.3.a.2 La celda destino no se mueve
+			if(! GUI_Layout.S.board_def[destino.x, destino.y].isMoving)
+				return;
+
+			//1.3.a.1 La celda destino se mueve, y además casi al mismo sitio
+			Vector3 destinoCeldaDestino = GUI_Layout.S.board_def[destino.x, destino.y].getNextPosition();
+			//TODO
+		
+
+			if(destino!=null && GUI_Layout.S.board_def[destino.x, destino.y].isMoving){ //1.2.a.1 Las dos se mueven
+				int real_newpos_x = (int) GUI_Layout.S.board_def[this.original_x, this.original_z].getNextPosition().x + _x;
+				int real_newpos_z = (int) GUI_Layout.S.board_def[this.original_x, this.original_z].getNextPosition().z + _z;
+
+				if(GUI_Layout.S.board_def[destino.x, destino.y].getNextPosition().x != real_newpos_x ||
+					GUI_Layout.S.board_def[destino.x, destino.y].getNextPosition().z != real_newpos_z) //Se mueven, pero no al mismo sitio
+					return;
+
+				if(GUI_Layout.S.board_def[destino.x, destino.y].getNextPosition().y != y ) //se mueven al mismo sitio, pero no a la misma altura
+					return;
+			}
+		}*/
+
+
 
 
 		//1.3- esta a la misma altura
@@ -143,21 +185,21 @@ public class Robot : MonoBehaviour {
 	}
 
 
-
 	public void updatePosition(){
 		this.original_x = x;
 		this.original_z = z;
 
 		this.transform.parent = GUI_Layout.S.board[this.original_x, this.original_z].transform;
 
-		//TODO: Al colocarnos en la nueva casilla, sería interesante que nos colocaramos
-		//      centrados para que quede todo más chuli.
-
-		//Al hacer el atach, nos recolocamos por si hemos perdido algo de  precisión
-		//Vector3 newPos = GUI_Layout.S.board[this.original_x, this.original_z].transform.position;
-
-		//this.transform.position = new Vector3(newPos.x, this.transform.position.y, newPos.z);
+		this.transform.localPosition = new Vector3(0, this.transform.position.y, 0);
+	}
 
 
+	public void updatePosition(int newx, int newz, int origx, int origz){
+		this.original_x = origx;
+		this.original_z = origz;
+
+		this.transform.parent = GUI_Layout.S.board[this.original_x, this.original_z].transform;
+		this.transform.localPosition = new Vector3(0, this.transform.position.y, 0);
 	}
 }
