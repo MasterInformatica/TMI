@@ -33,6 +33,7 @@ public class TileMvto : MonoBehaviour {
 	public float eps = 0.1f;
 	public float eps2 = 0.1f;
 	bool isMoving;
+	bool preventMove;
 
 	public List<Vector3> estados;
 	int estadosIdx;
@@ -118,7 +119,10 @@ public class TileMvto : MonoBehaviour {
 		}
 
 		//print("Muevete " + estados[estadosIdx]);
-
+		if (isMoving) {
+			isMoving = false;
+			this.transform.position = poi;
+		}
 		mvtoStart = Time.time;
 		mvtoStop = mvtoStart + duracion;
 
@@ -132,7 +136,7 @@ public class TileMvto : MonoBehaviour {
 		if( !isMoving )	return;
 
 		if(isMoving && Time.time >= mvtoStop) { // Colocamos en la posicion final por posibles desviaciones
-			//this.transform.position = this.poi;
+			this.transform.position = this.poi;
 			isMoving = false;
 			return;
 		}

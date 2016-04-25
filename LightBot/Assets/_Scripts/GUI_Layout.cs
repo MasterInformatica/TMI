@@ -363,7 +363,11 @@ public class GUI_Layout : MonoBehaviour {
 
 		//3.- Casillas de movimiento
 		if(this.board_def[x,z].typeMvto != tipoMovimiento.none){
-			tile.GetComponent<TileMvto>().TAM = (2*this.blockSize) + this.blockSeparation;
+			if(this.board_def[x,z].typeMvto == tipoMovimiento.vertical)
+				tile.GetComponent<TileMvto>().TAM = (this.blockSize) + this.blockSeparation;
+			else
+				tile.GetComponent<TileMvto>().TAM = (2*this.blockSize) + this.blockSeparation;
+
 
 			tile.GetComponent<TileMvto>().initMvto(this.board_def[x,z].typeMvto, this.board_def[x,z].nSteps);
 		}

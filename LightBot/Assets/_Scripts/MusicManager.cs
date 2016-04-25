@@ -11,7 +11,7 @@ public delegate void startMvto_t(float duracion);
 public class MusicManager : MonoBehaviour, AudioProcessor.AudioCallbacks {
 	public static MusicManager S; //Singleton
 	public AudioSource audio;
-
+	public float delta = 1.3f;
 	public bool ___________________________________________________;
 
 	private float last;
@@ -70,7 +70,9 @@ public class MusicManager : MonoBehaviour, AudioProcessor.AudioCallbacks {
 	public void onOnbeatDetected()
 	{
 		float recent = Time.time;
-		callListeners (recent - last);
+		if (recent - last >= delta)
+			last = recent - delta;
+		callListeners ((float)recent - last);
 		last = recent;
 	}
 	
