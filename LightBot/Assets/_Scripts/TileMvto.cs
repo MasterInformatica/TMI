@@ -3,12 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 
-/**
- * Este método permite realizar movimientos a partir de llamadas startMvto(duracion).
- *  Si se realiza una llamada startMvto pero no ha finalizado el mvto anterior (duracion), ignora la llamada.
- *  Si finaliza un movimiento, espera a una llamada startMvto para comenzar el siguiente.
- * 
- **/
 public enum tipoMovimiento{
 	horizontal, 
 	vertical,
@@ -17,26 +11,37 @@ public enum tipoMovimiento{
 }
 
 
+
+/**
+ * Esta clase permite realizar movimientos a partir de llamadas startMvto(duracion).
+ *  Si se realiza una llamada startMvto pero no ha finalizado el mvto anterior (duracion) ignora la llamada.
+ *  Si finaliza un movimiento, espera a una llamada startMvto para comenzar el siguiente.
+ *  Se puede tener en cuenta que haya un ciclo de espera entre movimiento y movimiento.
+ **/
+
 public class TileMvto : MonoBehaviour {
-	public float TAM = 1; //Tamaño a mover
+	//Determina si hay que esperar entre un movimiento o no.
+	public bool esperaEntreMovimientos = true;
 
+	public bool ______________________________;
 
-	float mvtoStart;
-	float mvtoStop;
+	public float TAM; //Tamaño a mover
 
-	bool esperaEntreMovimientos = true; //Determina si hay que esperar entre un movimiento o no.
-
+	//Relacionado con el cálculo del movimiento
+	public float mvtoStart;
+	public float mvtoStop;
 	Vector3 poi;
 	Vector3 originalPosition;
 
-	public bool ______________________________;
+	// Relacionado con el movimiento actual
 	public float eps = 0.1f;
-	public float eps2 = 0.1f;
 	bool isMoving;
-	bool preventMove;
 
+	// Estados que definen el movimiento de la casilla
 	public List<Vector3> estados;
 	int estadosIdx;
+
+
 
 
 	void Awake () {
@@ -48,81 +53,51 @@ public class TileMvto : MonoBehaviour {
 	}
 
 
+
 	/** Inicializa el script para moverse según tm en el numero de pasos indicado */
 	public void initMvto(tipoMovimiento tm, int pasos){
+		Vector3 incr = Vector3.zero;
+
 		switch(tm){
 		case tipoMovimiento.horizontal:
-			creaHorizontal(pasos);
+			incr = new Vector3(TAM, 0, 0);
 			break;
 		case tipoMovimiento.vertical:
-			creaVertical(pasos);
+			incr = new Vector3(0, TAM, 0);
 			break;
 		case tipoMovimiento.frente:
-			creaFrente(pasos);
+			incr = new Vector3(0, 0, TAM);
 			break;
 		}
 
-		//nos registramos
+		//Movimiento directo con pausa
+		for(int i=0; i<pasos; i++){
+			this.estados.Add(incr);
+			if(this.esperaEntreMovimientos) this.estados.Add(new Vector3(0,0,0));
+		}
+
+		//Movimiento reverso con pausa
+		for(int i=0; i<pasos; i++){
+			this.estados.Add(-1*incr);
+			if(this.esperaEntreMovimientos) this.estados.Add(new Vector3(0,0,0));
+		}
+
+		//REGISTRO LISTENER DE LOS BEATS
 		MusicManager.S.registerTileListener(this.startMvto);
 	}
+		
 
-
-	void creaFrente(int pasos){
-		//movimiento dcha, pausa
-		for(int i=0; i<pasos; i++){
-			this.estados.Add(new Vector3(0, 0 , TAM));
-			if(this.esperaEntreMovimientos) this.estados.Add(new Vector3(0, 0, 0));
-		}
-
-		//mvto izq, pausa
-		for(int i=0; i<pasos; i++){
-			this.estados.Add(new Vector3(0, 0 , -1*TAM));
-			if(this.esperaEntreMovimientos) this.estados.Add(new Vector3(0, 0, 0));
-		}
-	}
-
-
-	void creaHorizontal(int pasos){
-		//movimiento dcha, pausa
-		for(int i=0; i<pasos; i++){
-			this.estados.Add(new Vector3(TAM, 0 , 0));
-			if(this.esperaEntreMovimientos) this.estados.Add(new Vector3(0, 0, 0));
-		}
-
-		//mvto izq, pausa
-		for(int i=0; i<pasos; i++){
-			this.estados.Add(new Vector3(-1*TAM, 0 , 0));
-			if(this.esperaEntreMovimientos) this.estados.Add(new Vector3(0, 0, 0));
-		}
-	}
-
-	void creaVertical(int pasos){
-		//movimiento dcha, pausa
-		for(int i=0; i<pasos; i++){
-			this.estados.Add(new Vector3(0, TAM , 0));
-			if(this.esperaEntreMovimientos) this.estados.Add(new Vector3(0, 0, 0));
-		}
-
-		//mvto izq, pausa
-		for(int i=0; i<pasos; i++){
-			this.estados.Add(new Vector3(0, -1*TAM, 0));
-			if(this.esperaEntreMovimientos) this.estados.Add(new Vector3(0, 0, 0));
-		}
-	}
 
 
 	public void startMvto(float duracion){
 
 		if(isMoving && Mathf.Abs(Time.time - mvtoStop) >= Time.deltaTime) {
-			//			print("No puedes pasar!!! Tiempo act: " + Time.time + "Stop: " + mvtoStop);
+			//me mandan moverme, pero estoy actualmente moviendome y me queda más de un frame para acabar el movimiento.
+			//Aunque el tiempo de los frames no tiene por qué ser siempre el mismo, nos fiamos del tiempo del último
+			//frame para suponer que el tiempo del frame actual va a ser el mismo.
 			return;
 		}
 
-		//print("Muevete " + estados[estadosIdx]);
-		if (isMoving) {
-			isMoving = false;
-			this.transform.position = poi;
-		}
 		mvtoStart = Time.time;
 		mvtoStop = mvtoStart + duracion;
 

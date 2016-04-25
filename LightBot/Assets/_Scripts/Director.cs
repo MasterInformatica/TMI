@@ -5,14 +5,26 @@ using System.Collections.Generic;
 /**
  * Estructura auxiliar usada para la reproduccion de los comandos
  */
-struct PairInt {
+
+public class PairInt {
 	public PairInt(int a, int b) {
+		x = a;
+		y = b;
+	}
+
+	public PairInt(){
+		x = -1;
+		y = -1;
+	}
+
+	public void setValues(int a, int b){
 		x = a;
 		y = b;
 	}
 
 	public int x, y;
 }
+
 
 
 /**
@@ -72,14 +84,14 @@ public class Director : MonoBehaviour {
 	public void play(){
 		Actions_Layout.S.changeButton();
 
-		if (this.recording) {
+		if (this.recording) {                                //Play
 			this.recording = false;
 			this.llamadas = new Stack<PairInt>();
 			this.llamadas.Push(new PairInt(0,0));
 			Actions_Layout.S.switchOffAllLights();
 
 			Next ();
-		}else{
+		}else{                                               //Stop
 			this.restartLevel();
 		}
 	}

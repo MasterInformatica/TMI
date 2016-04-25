@@ -70,15 +70,21 @@ public class GUI_Layout : MonoBehaviour {
 	private int size_z;
 	private int default_height;
 
+
 	// Definiciones e instancias de las celdas
-	public TileDef[,] board_def;
-	public GameObject[,] board;
+	//-----------------------------------------------------------------------------------------------------------------
+	public TileDef[,]    board_def; //Representación _LÓGICA_ del tablero
+	public GameObject[,] board;  //Representación _FÍSICA_ del tablero
+	public PairInt[,]    current_board; //Estado actual del mapa, contempola los movimientos de las casillas
+	//-----------------------------------------------------------------------------------------------------------------
+
 
 	//Anchor para el board
 	public GameObject boardAnchor;
 
 	//Gameobject del robot para poder destruirlo
 	public GameObject robot;
+
 
 
 
@@ -142,6 +148,7 @@ public class GUI_Layout : MonoBehaviour {
 		//2.- Celdas por defecto
 		this.default_height = int.Parse (xml ["board"] [0].att ("default_height"));
 		this.initBoard (this.default_height, this.size_x, this.size_z);
+		this.emptyCurrentBoard();
 
 
 		//3.- Definimos de las celdas
@@ -188,6 +195,10 @@ public class GUI_Layout : MonoBehaviour {
 				this.board_def[x,z].typeMvto = tipoMovimiento.none;
 				break;
 			}
+
+
+			//Cada celda ocupa su posicion original al comenzar el juego
+			this.current_board[x,z] = new PairInt(x, z);
 		}
 
 		//4.- Posicion inicial del robot.
@@ -282,6 +293,8 @@ public class GUI_Layout : MonoBehaviour {
 	 */
 	private void resetLayout(){
 		this.board_def = new TileDef[MAX_SIZE, MAX_SIZE];
+		this.current_board = new PairInt[MAX_SIZE, MAX_SIZE];
+
 		if(this.board != null){
 			for (int i=0; i<MAX_SIZE; i++)
 				for (int j=0; j<MAX_SIZE; j++)
@@ -325,6 +338,18 @@ public class GUI_Layout : MonoBehaviour {
 					td.type = (h<=0) ? TileType.none : TileType.normal;
 					this.board_def[i,j] = td;
 				}
+			}
+		}
+	}
+
+	/*
+	 * Inicia el tablero real/actual del juego. 
+	 * En un principio se inicia a null ya que no hay ninguna casila colocada.
+	 */
+	private void emptyCurrentBoard(){
+		for(int i=0; i<this.MAX_SIZE; i++){
+			for(int j=0; j<this.MAX_SIZE; j++){
+				this.current_board[i,j] = null;
 			}
 		}
 	}
@@ -408,6 +433,7 @@ public class GUI_Layout : MonoBehaviour {
 			return -1;
 		}
 	}
+
 
 	public void restartLayout(){
 		this.resetLayout ();
