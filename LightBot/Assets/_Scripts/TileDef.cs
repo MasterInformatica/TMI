@@ -163,7 +163,8 @@ public class TileDef {
 
 				
 			//Como nos vamos a mover, nos borramos del current board si nadie lo ha hecho por nosotros
-			if(GUI_Layout.S.current_board[this.x, this.z].x == this.original_x &&
+			if(GUI_Layout.S.current_board[this.x, this.z] != null &&
+				GUI_Layout.S.current_board[this.x, this.z].x == this.original_x &&
 				GUI_Layout.S.current_board[this.x, this.z].y == this.original_z){
 				GUI_Layout.S.current_board[this.x, this.z] = null;
 			}
@@ -191,14 +192,21 @@ public class TileDef {
 	 *  etc. Básicamente se utiliza para comprobar si dos casillas son adyacentes o no
 	 */
 	public Vector3 getCurrentPosition(){
+		if(this.typeMvto==tipoMovimiento.none)
+			return new Vector3(this.x, this.y, this.z);
 		return estados[currentState];
 	}
 
+
 	public Vector3 getNextPosition(){
+		if(this.typeMvto==tipoMovimiento.none)
+			return new Vector3(this.x, this.y, this.z);
+
+
 		if(isMoving)
-			return estados[(currentState + 1) % estados.Count];
+			return this.estados[(currentState + 1) % estados.Count];
 		else
-			return estados[currentState];
+			return this.estados[this.currentState];
 	}
 
 
