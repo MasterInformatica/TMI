@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -43,7 +43,7 @@ public class Director : MonoBehaviour {
 
 	public bool ______________________________;
 
-	public List< List<ActionType> > acciones; //Lista de lista de acciones. Por cada panel existe una lista de acciones.
+	public List< List<Action> > acciones; //Lista de lista de acciones. Por cada panel existe una lista de acciones.
 	public bool recording; //Bool indicando si se esta reproduciendo o grabando acciones
 	public int panelActiveId; // Int indicando el panel actual activo
 
@@ -59,30 +59,14 @@ public class Director : MonoBehaviour {
 
 	public void Start(){
 		this.recording = true;
-				
-		this.acciones = new List<List<ActionType>> ();
-		this.acciones.Add(new List<ActionType>());
-		this.acciones.Add(new List<ActionType>());
-		this.acciones.Add(new List<ActionType>());
 	}
-
-
-	// Añade la accion pasada por parametro al panel actual.
-	// Guarda la accion en la lista de acciones local.
-	public void addAction(ActionType at){
-		if (!this.recording)
-			return;
-
-		this.acciones[this.panelActiveId].Add (at);
-		Actions_Layout.S.insertInPanel (this.panelActiveId, at);
-	}
-
 
 	// Ejecuta los comandos que estaban guardados
 	// Para ello, apila en una pila parejas <int,int>, que representan 
 	// <panelId, ActionId>. Simula una pila de llamadas de funciones.
 	public void play(){
-		Actions_Layout.S.changeButton();
+		this.acciones = Actions_Layout.S.getActions ();
+//		Actions_Layout.S.changeButton();
 
 		if (this.recording) {                                //Play
 			this.recording = false;
@@ -119,7 +103,8 @@ public class Director : MonoBehaviour {
 
 	//Ejecuta la accion i sobre la lista a, y apila la siguiente en la pila de llamadas
 	public void ejecutaAccion(int a, int i){
-
+		if (i >= this.acciones [a].Count)
+			return;
 		//apagamos la anterior si podemos
 		if (i > 0)
 			Actions_Layout.S.lightCube (a, i - 1, false);
@@ -132,8 +117,8 @@ public class Director : MonoBehaviour {
 		else
 			this.llamadas.Push (new PairInt (a, -1));
 
-
-		switch (this.acciones[a][i]) {
+		Debug.Log ("ejecuta  " + a + "_" + i);
+		switch (this.acciones[a][i].actionType) {
 		case ActionType.up:
 			Robot.S.moveUP ();
 			break;
@@ -161,6 +146,9 @@ public class Director : MonoBehaviour {
 		case ActionType.p2:
 			this.llamadas.Push (new PairInt(2,0));
 			Invoke("Next", 0);
+			break;
+		case ActionType.pause:
+			Robot.S.pauseAction();
 			break;
 		default:
 			break;
@@ -203,19 +191,6 @@ public class Director : MonoBehaviour {
 		GUI_Layout.S.restartLayout();
 		Actions_Layout.S.switchOffAllLights();
 
-		this.panelActiveId = 0;
-		Actions_Layout.S.paneles [0].activatePanel ();
 	}
 
-
-	// Almacena el panel activo y ordena que se pinte al nuevo.
-	// Apaga el panel activo viejo
-	public void panelActive(int i){
-		if(i != this.panelActiveId)
-			Actions_Layout.S.paneles[this.panelActiveId].deactivatePanel();
-
-		this.panelActiveId = i;
-
-
-	}
 }

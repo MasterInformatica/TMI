@@ -39,7 +39,9 @@ public class Robot : MonoBehaviour {
 		this.updatePosition();
 	}
 
-
+	public void pauseAction(){
+		this.mvt.pauseAction ();
+	}
 
 	// Avanzar el robot hacia delante.
 	public void moveUP(){

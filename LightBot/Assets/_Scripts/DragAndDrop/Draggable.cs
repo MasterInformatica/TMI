@@ -15,7 +15,6 @@ public class Draggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
 
 
 	public void OnBeginDrag(PointerEventData eventData){
-		Debug.Log ("OnBeginDrag");
 		placeholder = new GameObject();
 
 		LayoutElement le = placeholder.AddComponent<LayoutElement>();
@@ -33,6 +32,7 @@ public class Draggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
 			myclone.GetComponent<RectTransform> ().sizeDelta = GetComponent<RectTransform> ().sizeDelta;
 			myclone.transform.position = this.transform.position;
 			placeholderReturnParent = this.transform.parent.parent.parent.parent;
+			placeholder.GetComponent<LayoutElement>().ignoreLayout = true;
 		} else {
 			parentToReturnTo = this.transform.parent;
 			placeholderReturnParent = parentToReturnTo;
@@ -44,15 +44,19 @@ public class Draggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
 		placeholder.transform.SetParent( placeholderParent );
 		placeholder.transform.SetSiblingIndex( this.transform.GetSiblingIndex() );
 
+
 	}
-	int count;
+
 	public void OnDrag(PointerEventData eventData){
 		Vector3 globalMousePos;
-		RectTransformUtility.ScreenPointToWorldPointInRectangle (eventData.pointerEnter.transform as RectTransform, eventData.position, eventData.pressEventCamera, out globalMousePos);
+		try{// try catch por si nos salimos del canvas
+			RectTransformUtility.ScreenPointToWorldPointInRectangle (eventData.pointerEnter.transform as RectTransform, eventData.position, eventData.pressEventCamera, out globalMousePos);
+		}catch{
+			return;
+		}
 		if (clone) {
 			myclone.transform.position = globalMousePos;
 			myclone.GetComponent<RectTransform> ().localScale = new Vector3(1.0f,1.0f,1.0f);
-			//myclone.GetComponent<RectTransform> ().sizeDelta = new Vector2(30.0f,30.0f);
 		} else {
 			this.transform.position = globalMousePos;
 			GetComponent<RectTransform> ().localScale = new Vector3(1.0f,1.0f,1.0f);
@@ -62,8 +66,11 @@ public class Draggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
 
 		if (placeholder.transform.parent != placeholderParent) {
 			placeholder.transform.SetParent (placeholderParent);
-			if (placeholderParent != null) 
+			if (placeholderParent != null){ 
 				placeholder.transform.SetSiblingIndex( placeholderParent.transform.GetSiblingIndex() );
+				placeholder.GetComponent<LayoutElement>().ignoreLayout = false;
+			}if( placeholderParent.name == "Action_Menu")
+				placeholder.GetComponent<LayoutElement>().ignoreLayout = true;
 		}
 		int newSiblingIndex = placeholderParent.childCount;
 		
@@ -99,7 +106,6 @@ public class Draggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
 	}
 
 	public void OnEndDrag(PointerEventData eventData){
-		Debug.Log ("OnEndDrag");
 		if (clone){
 			if(parentToReturnTo == null  || parentToReturnTo.name == "Trash" || parentToReturnTo.childCount >= MAX){
 				Destroy (myclone);

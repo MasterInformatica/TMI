@@ -50,6 +50,20 @@ public class Movement : MonoBehaviour {
 	}
 
 
+	public void pauseAction(){
+		this.isMoving = true;
+		this.isRotating = false;
+		this.isJumping = false;
+		
+		this.timeStart = Time.time;
+		this.timeDuration = this.MVTO_DURATION;
+		
+		
+		this.orgPosition = this.transform.position;
+		this.poi = this.transform.position;
+	}
+
+
 	/** 
 	 * Comienza el movimiento hacia delante de la entidad.
 	 * No comprueba si se encucentra ya en movimiento

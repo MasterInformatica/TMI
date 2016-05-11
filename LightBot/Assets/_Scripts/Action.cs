@@ -11,6 +11,7 @@ public enum ActionType{
 	left,
 	jump,
 	play,
+	restart,
 	light,
 	trash,
 	pause,
@@ -27,24 +28,24 @@ public class Action : MonoBehaviour {
 	//Tipo de accion que representa el boton
 	public ActionType actionType;
 
-
-	
-	public void OnMouseUpAsButton()
-	{
+	public void OnClick(){
 		switch (this.actionType) {
 		case ActionType.play:
-			Director.S.play();
+			Director.S.play ();
 			break;
-		case ActionType.trash:
-			Director.S.trash();
+		case ActionType.restart:
+			Director.S.play (); // TODO restart musica
 			break;
-		case ActionType.none: //si pulsamos en una accion vacia, es que estamos en el panel
-			Panel p = transform.parent.transform.parent.GetComponent<Panel>(); 
-			p.activatePanel();
-			break;
-		default: //acciones para el robot
-			Director.S.addAction (this.actionType);
+		case ActionType.light:
+			changeColor();
 			break;
 		}
 	}
+
+	public void changeColor(){
+		Debug.Log ("TODO: change color");
+	}
+
+	private int color = 100;
+
 }
