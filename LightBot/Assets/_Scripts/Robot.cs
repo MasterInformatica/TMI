@@ -15,10 +15,7 @@ public class Robot : MonoBehaviour {
 	public int x, y, z; //Posicion actual del robot. Sirve para comrpobar si el siguiente movimiento es posible
 	public int _x, _z; //Indica hacia donde esta mirando para poder saber hacia donde moverse
 
-
-
-	//Posiciones originales del robot. Representan la posición original de la celda actual antes de empezar su movimiento.
-	public int original_x, original_z;
+	public int x_coord, z_coord; //Cordenadas reales de la celda destino
 
 
 
@@ -33,9 +30,9 @@ public class Robot : MonoBehaviour {
 		x = posx; y = posy; z = posz;
 		_x = rotx; _z = rotz;
 
-		original_x = posx;
-		original_z = posz;
 
+		x_coord = posx;
+		z_coord = posz;
 		this.updatePosition();
 	}
 
@@ -45,9 +42,9 @@ public class Robot : MonoBehaviour {
 
 	// Avanzar el robot hacia delante.
 	public void moveUP(){
-		int x = GUI_Layout.S.board_def[original_x,original_z].x;
-		int y = GUI_Layout.S.board_def[original_x,original_z].height;
-		int z = GUI_Layout.S.board_def[original_x,original_z].z;
+		int x = GUI_Layout.S.board_def[x_coord, z_coord].x;
+		int y = GUI_Layout.S.board_def[x_coord, z_coord].height;
+		int z = GUI_Layout.S.board_def[x_coord, z_coord].z;
 
 		//1.- Comprobar que se puede mover a la nueva posicion
 		int newpos_x = x + _x;
@@ -58,51 +55,15 @@ public class Robot : MonoBehaviour {
 		   newpos_x >= GUI_Layout.S.MAX_SIZE || newpos_z > GUI_Layout.S.MAX_SIZE)
 			return;
 
-		PairInt destino = GUI_Layout.S.current_board[newpos_x, newpos_z];
 
-		//1.2- existe la celda destino
-		if (destino==null ||  GUI_Layout.S.board_def[destino.x, destino.y].type == TileType.none)
+		//Si hay alguna casilla que llegue al destino, la cogemos
+		PairInt pp = getCasillaPosibleDestino(newpos_x, newpos_z);
+
+		if(pp==null)
 			return;
 
-
-		/* 1.3- El robot puede avanzar al frente en los siguientes casos:
-		 *   a) La celda actual se mueve:
-		 *      a.1) La celda destino tmb se mueve: La posicion original y la final es la misma (pueden estar quietos o en mvto).
-		 *      a.2) La celda destino no se mueve: Imposible moverse allí
-		 *   b) La celda actual está quieta:
-		 *      b.1) Destino se mueve: Imposible moverse allí
-		 *      b.2) Destino quieta: Comprobación normal.
-		 */
-
-	/*	//1.3.a Actual se mueve
-		if( GUI_Layout.S.board_def[this.original_x, this.original_z].isMoving){
-			//1.3.a.2 La celda destino no se mueve
-			if(! GUI_Layout.S.board_def[destino.x, destino.y].isMoving)
-				return;
-
-			//1.3.a.1 La celda destino se mueve, y además casi al mismo sitio
-			Vector3 destinoCeldaDestino = GUI_Layout.S.board_def[destino.x, destino.y].getNextPosition();
-			//TODO
-		
-
-			if(destino!=null && GUI_Layout.S.board_def[destino.x, destino.y].isMoving){ //1.2.a.1 Las dos se mueven
-				int real_newpos_x = (int) GUI_Layout.S.board_def[this.original_x, this.original_z].getNextPosition().x + _x;
-				int real_newpos_z = (int) GUI_Layout.S.board_def[this.original_x, this.original_z].getNextPosition().z + _z;
-
-				if(GUI_Layout.S.board_def[destino.x, destino.y].getNextPosition().x != real_newpos_x ||
-					GUI_Layout.S.board_def[destino.x, destino.y].getNextPosition().z != real_newpos_z) //Se mueven, pero no al mismo sitio
-					return;
-
-				if(GUI_Layout.S.board_def[destino.x, destino.y].getNextPosition().y != y ) //se mueven al mismo sitio, pero no a la misma altura
-					return;
-			}
-		}*/
-
-
-
-
-		//1.3- esta a la misma altura
-		if (y != GUI_Layout.S.board_def [newpos_x, newpos_z].height)
+		//1.3 Está a la misma altura
+		if(GUI_Layout.S.board_def[pp.x, pp.y].getNextPosition().y != this.y)
 			return;
 
 
@@ -110,40 +71,60 @@ public class Robot : MonoBehaviour {
 		this.mvt.Avanza ();
 		this.x = newpos_x;
 		this.z = newpos_z;
+		this.x_coord = pp.x;
+		this.z_coord = pp.y;
 
 	}
 
 
 	// Saltar hacia delante
 	public void jump(){
+		int x = GUI_Layout.S.board_def[x_coord, z_coord].x;
+		int y = GUI_Layout.S.board_def[x_coord, z_coord].height;
+		int z = GUI_Layout.S.board_def[x_coord, z_coord].z;
+
+
 		//1.- Comprobar que se puede mover a la nueva posicion
 		int newpos_x = x + _x;
 		int newpos_z = z + _z;
-		
+
 		//1.1- esta dentro del tablero
 		if(newpos_x <0 || newpos_z <0 ||
 		   newpos_x >= GUI_Layout.S.MAX_SIZE || newpos_z > GUI_Layout.S.MAX_SIZE)
 			return;
-		
-		//1.2- existe la celda
-		if (GUI_Layout.S.board_def[newpos_x, newpos_z].type == TileType.none)
-			return;
-		
 
-		//1.3- esta a una altura de diferencia
-		if (!(y == GUI_Layout.S.board_def [newpos_x, newpos_z].height+1 ||
-			  y == GUI_Layout.S.board_def [newpos_x, newpos_z].height-1 ))
+
+		Debug.Log("B");
+		//Si hay alguna casilla que llegue al destino, la cogemos
+		PairInt pp = getCasillaPosibleDestino(newpos_x, newpos_z);
+		if(pp==null)
 			return;
-		
+
+		Debug.Log("C " + pp.x + " , " + pp.y + " - " + GUI_Layout.S.board_def[pp.x, pp.y].height);
+		Debug.Log("C" + " YO: " + x_coord + z_coord);// + " , " + pp.y + " - " + GUI_Layout.S.board_def[pp.x, pp.y].height);
+		//1.3 Está a la misma altura
+		if(GUI_Layout.S.board_def[pp.x, pp.y].getNextPosition().y == this.y)
+			return;
+
+
+		Debug.Log("D" + pp.x + " , " + pp.y + " - " + GUI_Layout.S.board_def[pp.x, pp.y].height);
+		//1.3- esta a una altura de diferencia
+		if (!(y == GUI_Layout.S.board_def [pp.x, pp.y].height+1 ||
+			y == GUI_Layout.S.board_def [pp.x , pp.y].height-1 ))
+			return;
+
+		Debug.Log("E");
 		//2.- Mover
-		if (y > GUI_Layout.S.board_def [newpos_x, newpos_z].height)
+		if (y > GUI_Layout.S.board_def [pp.x, pp.y].height)
 			this.mvt.JumpDown ();
 		else
 			this.mvt.JumpUp ();
 
 		this.x = newpos_x;
 		this.z = newpos_z;
-		this.y = GUI_Layout.S.board_def [newpos_x, newpos_z].height;
+		this.y = GUI_Layout.S.board_def [pp.x, pp.y].height;
+		this.x_coord = pp.x;
+		this.z_coord = pp.y;
 	}
 
 
@@ -188,20 +169,67 @@ public class Robot : MonoBehaviour {
 
 
 	public void updatePosition(){
-		this.original_x = x;
-		this.original_z = z;
-
-		this.transform.parent = GUI_Layout.S.board[this.original_x, this.original_z].transform;
-
+		this.transform.parent = GUI_Layout.S.board[this.x_coord, this.z_coord].transform;
 		this.transform.localPosition = new Vector3(0, this.transform.position.y, 0);
 	}
 
-
+	/*
 	public void updatePosition(int newx, int newz, int origx, int origz){
 		this.original_x = origx;
 		this.original_z = origz;
 
 		this.transform.parent = GUI_Layout.S.board[this.original_x, this.original_z].transform;
 		this.transform.localPosition = new Vector3(0, this.transform.position.y, 0);
+	}
+*/
+
+	/* Devuelve las coordenadas de una casilla que en el siguiente movimiento va a estar en la posición
+	* pasada por parámetro.
+	*/
+	private PairInt getCasillaPosibleDestino(int x, int z){
+		GUI_Layout S = GUI_Layout.S;
+		PairInt aux = null;
+
+		//centro
+		aux = S.current_board[x,z];
+		if(aux!=null && 
+			S.board_def[aux.x, aux.y].getNextPosition().x == x &&
+			S.board_def[aux.x, aux.y].getNextPosition().z == z)
+			return aux;
+		//norte
+		if(x>0){
+			aux = S.current_board[x-1,z];
+			if(aux!=null && 
+				S.board_def[aux.x, aux.y].getNextPosition().x == x &&
+				S.board_def[aux.x, aux.y].getNextPosition().z == z)
+				return aux;
+		}
+		//sur
+		if(x+1<GUI_Layout.S.MAX_SIZE){
+			aux = S.current_board[x+1,z];
+			if(aux!=null && 
+				S.board_def[aux.x, aux.y].getNextPosition().x == x &&
+				S.board_def[aux.x, aux.y].getNextPosition().z == z)
+				return aux;
+		}
+		//este
+		if(z>0){
+			aux = S.current_board[x,z-1];
+			if(aux!=null && 
+				S.board_def[aux.x, aux.y].getNextPosition().x == x &&
+				S.board_def[aux.x, aux.y].getNextPosition().z == z)
+				return aux;
+		}
+		//oeste
+		if(z+1<GUI_Layout.S.MAX_SIZE){
+			aux = S.current_board[x,z+1];
+			if(aux!=null && 
+				S.board_def[aux.x, aux.y].getNextPosition().x == x &&
+				S.board_def[aux.x, aux.y].getNextPosition().z == z)
+				return aux;
+		}
+
+
+		return null;
 	}
 }
