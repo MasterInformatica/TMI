@@ -46,7 +46,11 @@ public class Movement : MonoBehaviour {
 
 	public List<Vector3>      bezierPts;
 
+	private CharacterAnimator animationController;
+
 	public void Start(){
+		GameObject character = this.transform.Find ("Character").gameObject;
+		this.animationController = character.GetComponent<CharacterAnimator> ();
 	}
 
 
@@ -54,6 +58,7 @@ public class Movement : MonoBehaviour {
 		this.isMoving = true;
 		this.isRotating = false;
 		this.isJumping = false;
+		this.animationController.setIdle();
 		
 		this.timeStart = Time.time;
 		this.timeDuration = this.MVTO_DURATION;
@@ -72,6 +77,7 @@ public class Movement : MonoBehaviour {
 		this.isMoving = true;
 		this.isRotating = false;
 		this.isJumping = false;
+		this.animationController.setMoving ();
 
 		this.timeStart = Time.time;
 		this.timeDuration = this.MVTO_DURATION;
@@ -89,6 +95,7 @@ public class Movement : MonoBehaviour {
 		this.isMoving = false;
 		this.isRotating = true;
 		this.isJumping = false;
+		this.animationController.setIdle ();
 
 		this.timeStart = Time.time;
 		this.timeDuration = this.MVTO_DURATION;
@@ -106,6 +113,7 @@ public class Movement : MonoBehaviour {
 		this.isMoving = false;
 		this.isRotating = true;
 		this.isJumping = false;
+		this.animationController.setIdle ();
 
 		this.timeStart = Time.time;
 		this.timeDuration = this.MVTO_DURATION;
@@ -141,6 +149,7 @@ public class Movement : MonoBehaviour {
 		this.isJumping = true;
 		this.isRotating = false;
 		this.isMoving = false;
+		this.animationController.setJumping ();
 
 		//iniciamos los puntos de bezier con el primero y el ultimo
 		bezierPts = new List<Vector3>();
@@ -171,6 +180,7 @@ public class Movement : MonoBehaviour {
 				isMoving = false; //fin del movimiento
 				Director.S.Next();
 				Robot.S.updatePosition();
+				//this.animationController.setIdle ();
 			}
 		}
 
@@ -184,6 +194,7 @@ public class Movement : MonoBehaviour {
 				this.rotAct = this.rotPoi;
 				isRotating = false; //fin del giro
 				Director.S.Next();
+				//this.animationController.setIdle ();
 			}
 		}
 
@@ -201,6 +212,7 @@ public class Movement : MonoBehaviour {
 				this.isJumping = false;
 				Director.S.Next();
 				Robot.S.updatePosition();
+				//this.animationController.setIdle ();
 
 			} else { // 0<=u<1, which means that this is interpolating now
 				// Use Bezier curve to move this to the right point
