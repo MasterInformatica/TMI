@@ -100,8 +100,11 @@ public class TileMvto : MonoBehaviour {
 
 		mvtoStart = Time.time;
 		mvtoStop = mvtoStart + duracion;
-
-		originalPosition = this.transform.position;
+		try{
+			originalPosition = this.transform.position;
+		}catch{
+			Debug.Log ("No existo");
+		}
 		updatePoi();
 		isMoving = true;
 	}

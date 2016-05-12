@@ -231,9 +231,9 @@ public class Movement : MonoBehaviour {
 	 *  de un movimiento en linea recta
 	 **/
 	private Vector3 GetAvanzaPoi(){
-		Vector3 aux = new Vector3 (this.dirAct.x * this.dirFrente.x,
-		                           this.dirAct.y * this.dirFrente.y,
-		                           this.dirAct.z * this.dirFrente.z);
+		Vector3 aux = new Vector3 (Mathf.RoundToInt(this.dirAct.x * this.dirFrente.x),
+		                           Mathf.RoundToInt(this.dirAct.y * this.dirFrente.y),
+		                           Mathf.RoundToInt(this.dirAct.z * this.dirFrente.z));
 
 		return this.transform.position + aux;
 	}

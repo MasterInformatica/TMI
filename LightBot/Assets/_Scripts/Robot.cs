@@ -186,46 +186,49 @@ public class Robot : MonoBehaviour {
 	/* Devuelve las coordenadas de una casilla que en el siguiente movimiento va a estar en la posición
 	* pasada por parámetro.
 	*/
-	private PairInt getCasillaPosibleDestino(int x, int z){
+	private PairInt getCasillaPosibleDestino(int x1, int z1){
+		float eps = 0.7f;
+		float x = this.transform.position.x / 2.0f +_x;
+		float z = this.transform.position.z / 2.0f +_z;
+		Debug.Log ("--(" + x + ", " + z + ") vs " + this.transform.position);
 		GUI_Layout S = GUI_Layout.S;
 		PairInt aux = null;
-
 		//centro
-		aux = S.current_board[x,z];
+		aux = S.current_board[x1,z1];
 		if(aux!=null && 
-			S.board_def[aux.x, aux.y].getNextPosition().x == x &&
-			S.board_def[aux.x, aux.y].getNextPosition().z == z)
+			Mathf.Abs (S.board_def[aux.x, aux.y].getNextPosition().x - x) < eps &&
+		   Mathf.Abs (S.board_def[aux.x, aux.y].getNextPosition().z -z)< eps)
 			return aux;
 		//norte
-		if(x>0){
-			aux = S.current_board[x-1,z];
+		if(x1>0){
+			aux = S.current_board[x1-1,z1];
 			if(aux!=null && 
-				S.board_def[aux.x, aux.y].getNextPosition().x == x &&
-				S.board_def[aux.x, aux.y].getNextPosition().z == z)
+			   Mathf.Abs (S.board_def[aux.x, aux.y].getNextPosition().x - x) < eps &&
+			   Mathf.Abs (S.board_def[aux.x, aux.y].getNextPosition().z -z)< eps)
 				return aux;
 		}
 		//sur
-		if(x+1<GUI_Layout.S.MAX_SIZE){
-			aux = S.current_board[x+1,z];
+		if(x1+1<GUI_Layout.S.MAX_SIZE){
+			aux = S.current_board[x1+1,z1];
 			if(aux!=null && 
-				S.board_def[aux.x, aux.y].getNextPosition().x == x &&
-				S.board_def[aux.x, aux.y].getNextPosition().z == z)
+			   Mathf.Abs (S.board_def[aux.x, aux.y].getNextPosition().x - x) < eps &&
+			   Mathf.Abs (S.board_def[aux.x, aux.y].getNextPosition().z -z)< eps)
 				return aux;
 		}
 		//este
-		if(z>0){
-			aux = S.current_board[x,z-1];
+		if(z1>0){
+			aux = S.current_board[x1,z1-1];
 			if(aux!=null && 
-				S.board_def[aux.x, aux.y].getNextPosition().x == x &&
-				S.board_def[aux.x, aux.y].getNextPosition().z == z)
+			   Mathf.Abs (S.board_def[aux.x, aux.y].getNextPosition().x - x) < eps &&
+			   Mathf.Abs (S.board_def[aux.x, aux.y].getNextPosition().z -z)< eps)
 				return aux;
 		}
 		//oeste
-		if(z+1<GUI_Layout.S.MAX_SIZE){
-			aux = S.current_board[x,z+1];
+		if(z1+1<GUI_Layout.S.MAX_SIZE){
+			aux = S.current_board[x1,z1+1];
 			if(aux!=null && 
-				S.board_def[aux.x, aux.y].getNextPosition().x == x &&
-				S.board_def[aux.x, aux.y].getNextPosition().z == z)
+			   Mathf.Abs (S.board_def[aux.x, aux.y].getNextPosition().x - x) < 0.4f &&
+			   Mathf.Abs (S.board_def[aux.x, aux.y].getNextPosition().z -z)< 0.4f)
 				return aux;
 		}
 
