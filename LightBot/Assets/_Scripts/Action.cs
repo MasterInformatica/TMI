@@ -34,7 +34,7 @@ public class Action : MonoBehaviour {
 			Director.S.play ();
 			break;
 		case ActionType.restart:
-			Director.S.play (); // TODO restart musica
+			Director.S.restartMusic (); 
 			break;
 		case ActionType.light:
 			changeColor();

@@ -66,7 +66,7 @@ public class Director : MonoBehaviour {
 	// <panelId, ActionId>. Simula una pila de llamadas de funciones.
 	public void play(){
 		this.acciones = Actions_Layout.S.getActions ();
-//		Actions_Layout.S.changeButton();
+		Actions_Layout.S.changeButton();
 
 		if (this.recording) {                                //Play
 			this.recording = false;
@@ -117,7 +117,6 @@ public class Director : MonoBehaviour {
 		else
 			this.llamadas.Push (new PairInt (a, -1));
 
-		Debug.Log ("ejecuta  " + a + "_" + i);
 		switch (this.acciones[a][i].actionType) {
 		case ActionType.up:
 			Robot.S.moveUP ();
@@ -191,6 +190,10 @@ public class Director : MonoBehaviour {
 		GUI_Layout.S.restartLayout();
 		Actions_Layout.S.switchOffAllLights();
 
+	}
+
+	public void restartMusic(){
+		AudioProcessor.S.stopAndPlay ();
 	}
 
 }

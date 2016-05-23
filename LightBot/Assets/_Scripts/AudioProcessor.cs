@@ -422,4 +422,9 @@ public class AudioProcessor : MonoBehaviour
 			return sum / del_length;
 		}
 	}
+
+	public void stopAndPlay(){
+		audioSource.Stop ();
+		audioSource.Play ();
+	}
 }

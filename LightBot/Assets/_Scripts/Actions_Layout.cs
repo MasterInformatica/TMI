@@ -71,11 +71,6 @@ public class Actions_Layout : MonoBehaviour {
 	// Cambia el boton de play por el de stop y viceversa
 	public void changeButton(){
 		this.play_btn.GetComponent<Image> ().overrideSprite = (this.playStatus) ? this.stop_Sprite : this.play_Sprite;
-		//this.play_btn.GetComponent<Button> ().targetGraphic = 
-		Debug.Log (" TODO change play button.");
-		/*SpriteRenderer sprr = (SpriteRenderer)(GameObject.Find("Action_play").GetComponentInChildren<SpriteRenderer> ());
-
-		sprr.sprite = (this.playStatus) ? this.stop_Sprite : this.play_Sprite;*/
 		this.playStatus = ! this.playStatus;
 	}
 }
