@@ -88,7 +88,7 @@ public class MusicManager : MonoBehaviour, AudioProcessor.AudioCallbacks {
 	//This event will be called every frame while music is playing
 	public void onSpectrum(float[] spectrum)
 	{
-		Color bgColor = Color(Random.value, Random.value, Random.value, 1.0);
+		//Color bgColor = Color(Random.value, Random.value, Random.value, 1.0);
 
 		//The spectrum is logarithmically averaged
 		//to 12 bands

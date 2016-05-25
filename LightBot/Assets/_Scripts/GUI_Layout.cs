@@ -42,6 +42,7 @@ public class GUI_Layout : MonoBehaviour {
 
 	// Lista de xml para cada nivel
 	public TextAsset[] niveles;
+	public AudioClip[] tracks;
 
 
 	// tamanyo maximo del tablero
@@ -85,8 +86,7 @@ public class GUI_Layout : MonoBehaviour {
 	//Gameobject del robot para poder destruirlo
 	public GameObject robot;
 
-
-
+	public AudioSource audio;
 
 	public void Awake(){
 		S = this;
@@ -104,6 +104,10 @@ public class GUI_Layout : MonoBehaviour {
 
 		this.drawlayout ();
 		this.drawRobot();
+		
+		//Cargamos la cancion en cuestion
+		audio.clip = tracks [levelLoad.music-1];
+		audio.Play ();
 
 		//Iniciamos el music manager
 		MusicManager.S.StartTime();
