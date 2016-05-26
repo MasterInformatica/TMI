@@ -21,7 +21,7 @@ public class Actions_Layout : MonoBehaviour {
 	public bool _________________________;
 
 	public List<Panel> paneles; //lista de los paneles segun se van creando
-	
+	public PanelSwitch swi;
 	public void Awake(){
 		S = this;
 	}
@@ -35,6 +35,7 @@ public class Actions_Layout : MonoBehaviour {
 		foreach(Panel p in this.paneles){
 			p.switchOffAllLIghts();
 		}
+		swi.moveToPanel (0);
 	}
 
 
@@ -42,6 +43,7 @@ public class Actions_Layout : MonoBehaviour {
 	public void lightCube(int panel, int i, bool status){
 		if (this.paneles.Count <= panel)
 			return;
+		swi.moveToPanel (panel);
 		this.paneles [panel].SwitchLight (i, status);
 	}
 

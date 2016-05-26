@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -25,7 +26,7 @@ public class Panel : MonoBehaviour {
 	// Construye el panel con el tamaño y el id pasados. Utiliza el prefab como celdas nulas.
 	public void buildPanel(int id){
 		this._id = id;
-
+		clear ();
 	}
 
 
@@ -51,33 +52,26 @@ public class Panel : MonoBehaviour {
 
 	//Modifica el fondo de todas las celdas a apagado
 	public void switchOffAllLIghts(){
-		//for(int i=0; i<this.celdas.Count; i++)
-		//	this.SwitchLight(i, false);
+		for(int i=0; i<this.transform.childCount; i++)
+			this.SwitchLight(i, false);
 	}
 
 	//Modifica el fondo de una celda en concreto
 	public void SwitchLight (int i, bool status){
-		//if (i >= this.celdas.Count)
+		if (i >= this.transform.childCount)
 			return;
 
-		Material newmat = status ? this.lightOn_mat : this.lightOff_mat;
+		Color newmat = status ? Color.yellow : Color.black;
 
-		MeshRenderer rmat;
-		//rmat = this.celdas[i].GetComponentInChildren<MeshRenderer>();
-
-		rmat.material = newmat;				
-
+		this.transform.GetChild(i).GetComponent<Image>().color = newmat;
 	}
 
 	// Modifica todas las celdas para ponerlas a null
 	public void clear(){
-		SpriteRenderer sr;
-
-		/*for(int i=0; i<this.celdas.Count; i++){
-			sr = this.celdas[i].GetComponentInChildren<SpriteRenderer>();	
-
-			sr.sprite = this.nullSprite;
-		}*/
+		foreach (Transform child in transform) {
+			GameObject.Destroy(child.gameObject);
+		}
 	}
 
 }
+

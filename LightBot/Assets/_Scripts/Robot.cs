@@ -94,26 +94,26 @@ public class Robot : MonoBehaviour {
 			return;
 
 
-		Debug.Log("B");
+//		Debug.Log("B");
 		//Si hay alguna casilla que llegue al destino, la cogemos
 		PairInt pp = getCasillaPosibleDestino(newpos_x, newpos_z);
 		if(pp==null)
 			return;
 
-		Debug.Log("C " + pp.x + " , " + pp.y + " - " + GUI_Layout.S.board_def[pp.x, pp.y].height);
-		Debug.Log("C" + " YO: " + x_coord + z_coord);// + " , " + pp.y + " - " + GUI_Layout.S.board_def[pp.x, pp.y].height);
+		//Debug.Log("C " + pp.x + " , " + pp.y + " - " + GUI_Layout.S.board_def[pp.x, pp.y].height);
+		//Debug.Log("C" + " YO: " + x_coord + z_coord);// + " , " + pp.y + " - " + GUI_Layout.S.board_def[pp.x, pp.y].height);
 		//1.3 Está a la misma altura
 		if(GUI_Layout.S.board_def[pp.x, pp.y].getNextPosition().y == this.y)
 			return;
 
 
-		Debug.Log("D" + pp.x + " , " + pp.y + " - " + GUI_Layout.S.board_def[pp.x, pp.y].height);
+	//	Debug.Log("D" + pp.x + " , " + pp.y + " - " + GUI_Layout.S.board_def[pp.x, pp.y].height);
 		//1.3- esta a una altura de diferencia
 		if (!(y == GUI_Layout.S.board_def [pp.x, pp.y].height+1 ||
 			y == GUI_Layout.S.board_def [pp.x , pp.y].height-1 ))
 			return;
 
-		Debug.Log("E");
+		//Debug.Log("E");
 		//2.- Mover
 		if (y > GUI_Layout.S.board_def [pp.x, pp.y].height)
 			this.mvt.JumpDown ();
@@ -190,7 +190,7 @@ public class Robot : MonoBehaviour {
 		float eps = 0.7f;
 		float x = this.transform.position.x / 2.0f +_x;
 		float z = this.transform.position.z / 2.0f +_z;
-		Debug.Log ("--(" + x + ", " + z + ") vs " + this.transform.position);
+
 		GUI_Layout S = GUI_Layout.S;
 		PairInt aux = null;
 		//centro

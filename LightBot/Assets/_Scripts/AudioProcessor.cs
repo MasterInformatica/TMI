@@ -341,7 +341,6 @@ public class AudioProcessor : MonoBehaviour
 	public void addAudioCallback(AudioCallbacks callback)
 	{
 		this.callbacks.Add(callback);
-		//Debug.Log(callback);
 	}
 	
 	public void removeAudioCallback(AudioCallbacks callback)
