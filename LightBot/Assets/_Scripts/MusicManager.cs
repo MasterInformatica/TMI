@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-
+using System;
 
 //Delegado: interfaz para el metodo de listener
 
@@ -88,18 +88,28 @@ public class MusicManager : MonoBehaviour, AudioProcessor.AudioCallbacks {
 	//This event will be called every frame while music is playing
 	public void onSpectrum(float[] spectrum)
 	{
-		//Color bgColor = Color(Random.value, Random.value, Random.value, 1.0);
-
+		Color bgColor;
 		//The spectrum is logarithmically averaged
 		//to 12 bands
-		
-		for (int i = 0; i < spectrum.Length; ++i)
+		int[] posZ = { 0,1,2,2,2,1,0,-1,-2,-2,-2,-1};
+		int[] posY = { 2,2,1,0,-1,-2,-2,-2,-1,0,1,2};
+
+		float[] sum = {0.0f,0.0f,0.0f};
+		int i = 0;
+		try{
+		foreach(float f in spectrum)
 		{
-			Vector3 start = new Vector3(i, 0, 0);
-			Vector3 end = new Vector3(i, spectrum[i], 0);
-			Debug.DrawLine(start, end);
+		
+			sum[i/3] += f;
+			i++;
 		}
+		}catch{
+		}
+		Vector3 n = new Vector3(sum[0],sum[1],sum[2]);n.Normalize ();
+		Camera.allCameras [0].backgroundColor = new Color (n.x, n.y, n.z,0.4f);
 	}
+
+
 
 
 }
